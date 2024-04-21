@@ -1,0 +1,13 @@
+.custom-text-field {
+    -fx-background-color: #f0f0f0;
+    -fx-border-color: #999999;
+    -fx-border-radius: 5;
+}
+
+.custom-text-field:hover {
+    -fx-background-color: #ffffff;
+}
+
+.custom-text-field:focused {
+    -fx-border-color: #007bff;
+}
