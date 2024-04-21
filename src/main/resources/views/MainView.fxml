@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="600.0" style="-fx-background-color: #00214A;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.prefect.user.management.app.controllers.main.MainController">
+    <center>
+        <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="465.0" prefWidth="350.0" BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets />
+            </BorderPane.margin>
+            <children>
+            <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="270.0" prefWidth="270.0" style="-fx-background-color: white; -fx-background-radius: 5;" AnchorPane.bottomAnchor="105.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="90.0">
+               <children>
+                      <TextField fx:id="usernameField" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="40.0" prefWidth="220.0" promptText="Username" style="-fx-background-color: #f0f0f0; -fx-border-color: #999999; -fx-border-radius: 5;" AnchorPane.bottomAnchor="160.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="70.0">
+                     <cursor>
+                        <Cursor fx:constant="TEXT" />
+                     </cursor>
+                  </TextField>
+                      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Sign in with your Account" textAlignment="JUSTIFY" textOrigin="CENTER" wrappingWidth="225.9999771118164" AnchorPane.bottomAnchor="218.169921875" AnchorPane.leftAnchor="12.0" AnchorPane.rightAnchor="12.0" AnchorPane.topAnchor="30.5849609375">
+                          <font>
+                              <Font name="Arial Rounded MT Bold" size="18.0" />
+                          </font>
+                      </Text>
+                      <TextField fx:id="passwordShown" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="40.0" prefWidth="220.0" promptText="Show Password" style="-fx-background-color: #f0f0f0; -fx-border-color: #999999; -fx-border-radius: 5;" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="130.0" />
+                      <PasswordField fx:id="passwordField" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="40.0" prefWidth="220.0" promptText="Password" style="-fx-background-color: #f0f0f0; -fx-border-color: #999999; -fx-border-radius: 5;" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="130.0">
+                     <cursor>
+                        <Cursor fx:constant="TEXT" />
+                     </cursor>
+                  </PasswordField>
+                      <Hyperlink onMouseClicked="#handleForgotPsw" prefHeight="13.0" prefWidth="108.0" text="Forgot Password?" textFill="#007bdb" AnchorPane.bottomAnchor="79.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="127.0" AnchorPane.topAnchor="170.0">
+                     <font>
+                        <Font size="10.0" />
+                     </font>
+                  </Hyperlink>
+                  <ToggleButton fx:id="toggleButton2" layoutX="205.0" layoutY="146.0" mnemonicParsing="false" onAction="#changeVisibility2" prefHeight="29.0" prefWidth="30.0" style="-fx-background-color: #f0f0f0;" AnchorPane.bottomAnchor="105.0" AnchorPane.leftAnchor="205.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="136.0">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <graphic>
+                        <ImageView accessibleRole="TOGGLE_BUTTON" fitHeight="19.0" fitWidth="115.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../assets/view.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </ToggleButton>
+                      <ToggleButton fx:id="toggleButton" layoutX="195.0" layoutY="136.0" mnemonicParsing="false" onAction="#changeVisibility" prefHeight="29.0" prefWidth="30.0" style="-fx-background-color: #f0f0f0;" AnchorPane.bottomAnchor="105.0" AnchorPane.leftAnchor="205.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="136.0">
+                          <cursor>
+                              <Cursor fx:constant="HAND" />
+                          </cursor>
+                          <graphic>
+                              <ImageView accessibleRole="TOGGLE_BUTTON" fitHeight="19.0" fitWidth="115.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true">
+                                  <image>
+                                      <Image url="@../assets/eyebrow.png" />
+                                  </image>
+                              </ImageView>
+                          </graphic>
+                      </ToggleButton>
+                      <Button fx:id="logButton" alignment="CENTER" contentDisplay="CENTER" layoutX="70.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#logButtonOnAction" prefHeight="30.0" prefWidth="130.0" style="-fx-background-radius: 20; -fx-background-color: #007BDB;" text="LOG IN" textAlignment="CENTER" textFill="WHITE" AnchorPane.bottomAnchor="32.0" AnchorPane.leftAnchor="70.0" AnchorPane.rightAnchor="70.0" AnchorPane.topAnchor="208.0" />
+               </children>
+            </AnchorPane>
+            </children>
+        </AnchorPane>
+    </center>
+    <right>
+        <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="250.0" style="-fx-background-color: #DDF0FF;" BorderPane.alignment="BOTTOM_CENTER">
+            <children>
+            <GridPane alignment="CENTER" maxWidth="-Infinity" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="500.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="190.0" valignment="CENTER" />
+                <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="40.0" valignment="CENTER" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="40.0" valignment="CENTER" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                      <ImageView accessibleRole="PARENT" fitHeight="190.0" fitWidth="194.0" nodeOrientation="INHERIT" pickOnBounds="true" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM">
+                          <image>
+                              <Image url="@../assets/deus22.png" />
+                          </image>
+                      </ImageView>
+                      <Text fill="#00214a" strokeType="INSIDE" strokeWidth="0.0" text="No Account? Create One." textAlignment="CENTER" wrappingWidth="196.0" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+                          <font>
+                              <Font name="Arial Rounded MT Bold" size="15.0" />
+                          </font>
+                      </Text>
+                      <Button fx:id="signButton" defaultButton="true" mnemonicParsing="false" onAction="#signButtonOnAction" prefHeight="25.0" prefWidth="84.0" style="-fx-background-color: none; -fx-background-radius: 15px; -fx-font-weight: 800;" stylesheets="@../styles/main.css" text="SIGN UP" textFill="#007bdb" underline="true" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="TOP">
+                          <font>
+                              <Font size="14.0" />
+                          </font>
+                          <cursor>
+                              <Cursor fx:constant="HAND" />
+                          </cursor>
+                      </Button>
+               </children>
+            </GridPane>
+            </children>
+        </AnchorPane>
+    </right>
+   <top>
+      <GridPane alignment="TOP_RIGHT" BorderPane.alignment="TOP_LEFT">
+        <columnConstraints>
+          <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" />
+          <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="250.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="35.0" valignment="TOP" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <HBox alignment="TOP_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="35.0" prefWidth="500.0" style="-fx-background-color: #DDF0FF;" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.valignment="TOP">
+               <children>
+                  <Button alignment="TOP_RIGHT" contentDisplay="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#quitApp" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: none;" textAlignment="CENTER">
+                     <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../assets/cross.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+      </GridPane>
+   </top>
+</BorderPane>

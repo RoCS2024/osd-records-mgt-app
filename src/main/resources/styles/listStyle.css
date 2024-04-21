@@ -1,0 +1,9 @@
+.sideBar {
+    -fx-background-color: #00214A;
+}
+
+.sideBar:hover {
+    -fx-background-color: rgba(0, 33, 74, 0.5);
+    -fx-border-color: WHITE;
+    -fx-border-width: 0 0 0 3px;
+}
