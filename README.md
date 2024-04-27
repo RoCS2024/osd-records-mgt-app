@@ -1,4 +1,4 @@
-osd-records-mgt-app
+osd-records-mgt-app setup
 
 First is setup the Database
 There are 3 database you need for osd-records-mgt-app
