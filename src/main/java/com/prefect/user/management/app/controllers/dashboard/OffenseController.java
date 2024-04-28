@@ -7,6 +7,7 @@ import com.prefect.office.record.management.appl.facade.prefect.offense.*;
 import com.prefect.office.record.management.data.dao.prefect.offense.OffenseDao;
 import com.prefect.office.record.management.data.dao.prefect.offense.impl.OffenseDaoImpl;
 import com.prefect.user.management.app.controllers.modal.EditOffenseController;
+import com.prefect.user.management.app.controllers.search.SearchOffenseController;
 import com.student.information.management.appl.facade.student.StudentFacade;
 import com.student.information.management.appl.facade.student.impl.StudentFacadeImpl;
 import com.student.information.management.appl.model.student.Student;
@@ -316,10 +317,11 @@ public class OffenseController implements Initializable {
             System.out.println("Student ID: " + student.getStudentId());
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/SearchStudentOffense.fxml"));
-                Parent root = loader.load();
-                SearchOffenseController searchController = loader.getController();
-                searchController.initData(student);
 
+                SearchOffenseController searchController = new SearchOffenseController();
+                searchController.initData(student);
+                loader.setController(searchController);
+                Parent root = loader.load();
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.setScene(new Scene(root));
                 stage.show();

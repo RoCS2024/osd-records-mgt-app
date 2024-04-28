@@ -5,6 +5,11 @@ import com.prefect.office.record.management.appl.facade.prefect.communityservice
 import com.prefect.office.record.management.appl.facade.prefect.communityservice.impl.CommunityServiceFacadeImpl;
 import com.prefect.office.record.management.data.dao.prefect.communityservice.impl.CommunityServiceDaoImpl;
 
+import com.prefect.user.management.app.controllers.search.SearchHistoryController;
+import com.prefect.user.management.app.controllers.search.SearchOffenseController;
+import com.student.information.management.appl.facade.student.StudentFacade;
+import com.student.information.management.appl.facade.student.impl.StudentFacadeImpl;
+import com.student.information.management.appl.model.student.Student;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -15,10 +20,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -48,6 +50,10 @@ public class CsHistoryController implements Initializable{
     private AnchorPane sidebarPane;
 
     private boolean sidebarVisible = false;
+
+    //for search
+    @FXML
+    private TextField searchField;
 
     //for table id
     @FXML
@@ -174,5 +180,39 @@ public class CsHistoryController implements Initializable{
         } else {
             BorderPane.setMargin(sidebarPane, new Insets(0, -125.0, 0, 0));
         }
+    }
+
+    //for search
+    @FXML
+    private void handleSearchButton(ActionEvent event) {
+       String studentId = searchField.getText();
+
+        if(studentId != null){
+            System.out.println("Student ID: " + studentId);
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/SearchHistory.fxml"));
+
+                SearchHistoryController searchHistoryController = new SearchHistoryController();
+                searchHistoryController.initData(studentId);
+                loader.setController(searchHistoryController);
+                Parent root = loader.load();
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            showAlert(Alert.AlertType.WARNING, "Warning", "Student ID Not Found", "Student with ID " + searchField.getText() + " does not exist.");
+
+        }
+    }
+    private void showAlert(Alert.AlertType alertType, String title, String headerText, String contentText) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(contentText);
+        alert.showAndWait();
     }
 }

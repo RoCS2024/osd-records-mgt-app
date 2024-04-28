@@ -1,4 +1,4 @@
-package com.prefect.user.management.app.controllers.dashboard;
+package com.prefect.user.management.app.controllers.modal;
 
 import com.prefect.office.record.management.appl.facade.prefect.violation.ViolationFacade;
 import com.prefect.office.record.management.appl.facade.prefect.violation.impl.ViolationFacadeImpl;

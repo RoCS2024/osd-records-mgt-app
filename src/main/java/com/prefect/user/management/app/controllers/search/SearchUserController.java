@@ -1,38 +1,31 @@
-package com.prefect.user.management.app.controllers.dashboard;
+package com.prefect.user.management.app.controllers.search;
 
 import com.prefect.user.management.app.controllers.modal.ChangePswController;
-import com.prefect.user.management.app.controllers.search.SearchOffenseController;
-import com.prefect.user.management.app.controllers.search.SearchUserController;
-import com.student.information.management.appl.facade.student.StudentFacade;
-import com.student.information.management.appl.facade.student.impl.StudentFacadeImpl;
-import com.student.information.management.appl.model.student.Student;
+import com.user.management.appl.facade.user.UserFacade;
 import com.user.management.appl.facade.user.impl.UserFacadeImpl;
 import com.user.management.appl.model.user.User;
-import com.user.management.appl.facade.user.*;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.stage.Stage;
-
-import javafx.stage.StageStyle;
-import javafx.util.Callback;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.util.Callback;
 
 import java.io.IOException;
 import java.net.URL;
@@ -42,35 +35,31 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class TableViewController implements Initializable {
-
-    //for sidebar uses
-    @FXML
-    private Button burgerButton;
-
-    @FXML
-    private ImageView burgerIcon;
-
-    @FXML
-    private AnchorPane sidebarPane;
-
-    private boolean sidebarVisible = false;
-
-    //for search
-    @FXML
-    private TextField searchField;
+public class SearchUserController implements Initializable {
 
     //for table id
     @FXML
     TableView table;
-
+    private int userId;
+    @FXML
+    private Button previousButton;
     private final UserFacade userFacade = new UserFacadeImpl();
+    public void initData(int userId) {
+        this.userId = userId;
+
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        previousButton.setOnAction(event -> {handleBack2Previous((ActionEvent) event);});
+
+        System.out.println("User ID: " + this.userId);
         table.getItems().clear();
         List<User> users = userFacade.getAllUsers();
-        ObservableList<User> data = FXCollections.observableArrayList(users);
+        User userData = userFacade.getUserById(userId);
+        System.out.println(userId);
+
+        ObservableList<User> data = FXCollections.observableArrayList(userData);
         table.setItems(data);
 
         TableColumn<User, Integer> userIdColumn = new TableColumn<>("USER ID");
@@ -144,79 +133,6 @@ public class TableViewController implements Initializable {
         };
     }
 
-    //button actions
-    @FXML
-    protected void handleIconUserList(MouseEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/UserList.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-            stage.setScene(new Scene(root));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    protected void handleIconOffense(MouseEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/OffenseList.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-            stage.setScene(new Scene(root));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    protected void handleIconViolationList(MouseEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/ViolationList.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-            stage.setScene(new Scene(root));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    protected void handleIconCommunityService(MouseEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/CommunityService.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-            stage.setScene(new Scene(root));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    protected void handleIconLogout (MouseEvent event) {
-        try {
-            Stage previousStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            previousStage.close();
-
-            Stage dashboardStage = new Stage();
-            dashboardStage.initStyle(StageStyle.UNDECORATED);
-
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/views/MainView.fxml"));
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
-            dashboardStage.setScene(scene);
-            dashboardStage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     //show details in edit button
     private void showEditUser(User user, ActionEvent event) {
         try {
@@ -241,36 +157,14 @@ public class TableViewController implements Initializable {
         }
     }
 
-    //for sidebar actions
     @FXML
-    private void toggleSidebarVisibility(ActionEvent event) {
-        sidebarVisible = !sidebarVisible;
-        sidebarPane.setVisible(sidebarVisible);
-
-        if (sidebarVisible) {
-            BorderPane.setMargin(sidebarPane, new Insets(0));
-        } else {
-            BorderPane.setMargin(sidebarPane, new Insets(0, -125.0, 0, 0));
-        }
-    }
-
-    //for search
-    @FXML
-    private void handleSearchButton(ActionEvent event) {
-        int userId = Integer.parseInt(searchField.getText());
-
-        System.out.println("User ID: " + userId);
+    protected void handleBack2Previous(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/SearchUser.fxml"));
-
-            SearchUserController searchUserController = new SearchUserController();
-            searchUserController.initData(userId);
-            loader.setController(searchUserController);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/UserList.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.show();
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
