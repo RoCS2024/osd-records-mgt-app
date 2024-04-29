@@ -6,6 +6,11 @@ import com.prefect.office.record.management.appl.facade.prefect.violation.*;
 
 import com.prefect.user.management.app.controllers.modal.ChangePswController;
 import com.prefect.user.management.app.controllers.modal.EditViolationController;
+import com.prefect.user.management.app.controllers.search.SearchOffenseController;
+import com.prefect.user.management.app.controllers.search.SearchViolationController;
+import com.student.information.management.appl.facade.student.StudentFacade;
+import com.student.information.management.appl.facade.student.impl.StudentFacadeImpl;
+import com.student.information.management.appl.model.student.Student;
 import com.user.management.appl.model.user.User;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,10 +23,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -49,6 +51,10 @@ public class ViolationController implements Initializable {
     private AnchorPane sidebarPane;
 
     private boolean sidebarVisible = false;
+
+    //for search
+    @FXML
+    private TextField searchField;
 
     //for table id
     @FXML
@@ -233,6 +239,27 @@ public class ViolationController implements Initializable {
             BorderPane.setMargin(sidebarPane, new Insets(0));
         } else {
             BorderPane.setMargin(sidebarPane, new Insets(0, -125.0, 0, 0));
+        }
+    }
+
+    //for search
+    @FXML
+    private void handleSearchButton(ActionEvent event) {
+        int violationId = Integer.parseInt(searchField.getText());
+
+        System.out.println("Violation ID: " + violationId);
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/SearchViolation.fxml"));
+
+            SearchViolationController searchViolationController = new SearchViolationController();
+            searchViolationController.initData(violationId);
+            loader.setController(searchViolationController);
+            Parent root = loader.load();
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

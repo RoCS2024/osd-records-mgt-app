@@ -158,12 +158,12 @@
                                           </Label>
                                        </children>
                                     </Pane>
-                                    <TextField fx:id="searchField" prefHeight="34.0" prefWidth="555.0" promptText="Search" style="-fx-background-radius: none;" GridPane.rowIndex="1">
+                                    <TextField fx:id="searchField" prefHeight="34.0" prefWidth="555.0" promptText="Search Student ID" style="-fx-background-radius: none;" GridPane.rowIndex="1">
                                        <GridPane.margin>
                                           <Insets top="10.0" />
                                        </GridPane.margin>
                                     </TextField>
-                                    <ToggleButton fx:id="searchButton" onAction="#handleSearchButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-color: white;" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+                                    <ToggleButton fx:id="searchButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#handleSearchButton" prefHeight="15.0" prefWidth="15.0" style="-fx-background-color: white;" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
                                        <GridPane.margin>
                                           <Insets right="15.0" top="10.0" />
                                        </GridPane.margin>

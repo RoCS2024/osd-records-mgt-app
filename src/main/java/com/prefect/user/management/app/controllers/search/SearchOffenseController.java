@@ -1,4 +1,4 @@
-package com.prefect.user.management.app.controllers.dashboard;
+package com.prefect.user.management.app.controllers.search;
 
 import com.prefect.office.record.management.appl.facade.prefect.offense.OffenseFacade;
 import com.prefect.office.record.management.appl.facade.prefect.offense.impl.OffenseFacadeImpl;
@@ -45,24 +45,27 @@ public class SearchOffenseController implements Initializable {
     @FXML
     private TableView<Offense> tableView;
 
+    @FXML
+    private Button previousButton;
     private OffenseFacade offenseFacade;
-    private Student searchedStudent;
+    private Student student;
 
     public void initData(Student student) {
-        this.searchedStudent = student;
+        this.student = student;
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        previousButton.setOnAction(event -> {handleBack2Previous((ActionEvent) event);});
+        System.out.println("student data passed: " + student.getStudentId());
+
         // Initialize OffenseFacade
         OffenseDao offenseDao = new OffenseDaoImpl();
         offenseFacade = new OffenseFacadeImpl(offenseDao);
 
-        // Check if searchedStudent is not null
-        if (searchedStudent != null) {
-            // Get all offenses
+        tableView.getItems().clear();
+        if (student != null) {
             List<Offense> allOffenses = offenseFacade.getAllOffenses();
-            // Filter offenses by searchedStudent
             List<Offense> studentOffenses = getOffensesByStudentId(allOffenses);
 
             // Compute total comm serv hours
@@ -136,8 +139,9 @@ public class SearchOffenseController implements Initializable {
     private List<Offense> getOffensesByStudentId(List<Offense> allOffenses) {
         List<Offense> studentOffenses = new ArrayList<>();
         for (Offense offense : allOffenses) {
-            if (offense.getStudent().equals(this.searchedStudent)) {
+            if (offense.getStudent().equals(student)) {
                 studentOffenses.add(offense);
+                System.out.println(offense);
             }
         }
         return studentOffenses;
