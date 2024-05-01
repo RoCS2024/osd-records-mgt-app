@@ -1,5 +1,6 @@
 package com.prefect.user.management.app.controllers.modal;
 
+import com.prefect.office.record.management.PrefectOfficeRecordMgtApplication;
 import com.prefect.office.record.management.appl.facade.prefect.violation.ViolationFacade;
 import com.prefect.office.record.management.appl.facade.prefect.violation.impl.ViolationFacadeImpl;
 import com.prefect.office.record.management.appl.model.violation.Violation;
@@ -34,10 +35,13 @@ public class EditViolationController implements Initializable {
 
     private Violation violation;
 
-    private ViolationFacade violationFacade = new ViolationFacadeImpl();
+    private ViolationFacade violationFacade;
 
     @FXML
     protected void saveEditViolationClicked(ActionEvent event) {
+        PrefectOfficeRecordMgtApplication app = new PrefectOfficeRecordMgtApplication();
+        violationFacade = app.getViolationFacade();
+
         Violation editViolation = new Violation();
 
         editViolation.setId(Integer.parseInt(violationIdField.getText()));

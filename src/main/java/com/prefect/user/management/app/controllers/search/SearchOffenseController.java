@@ -1,7 +1,9 @@
 package com.prefect.user.management.app.controllers.search;
 
+import com.prefect.office.record.management.PrefectOfficeRecordMgtApplication;
 import com.prefect.office.record.management.appl.facade.prefect.offense.OffenseFacade;
 import com.prefect.office.record.management.appl.facade.prefect.offense.impl.OffenseFacadeImpl;
+import com.prefect.office.record.management.appl.model.communityservice.CommunityService;
 import com.prefect.office.record.management.appl.model.offense.Offense;
 import com.prefect.office.record.management.data.dao.prefect.offense.OffenseDao;
 import com.prefect.office.record.management.data.dao.prefect.offense.impl.OffenseDaoImpl;
@@ -52,21 +54,22 @@ public class SearchOffenseController implements Initializable {
 
     public void initData(Student student) {
         this.student = student;
+        System.out.println("student data passed: " + student.getStudentId());
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        PrefectOfficeRecordMgtApplication app = new PrefectOfficeRecordMgtApplication();
+        offenseFacade = app.getOffenseFacade();
+
         previousButton.setOnAction(event -> {handleBack2Previous((ActionEvent) event);});
         System.out.println("student data passed: " + student.getStudentId());
 
-        // Initialize OffenseFacade
-        OffenseDao offenseDao = new OffenseDaoImpl();
-        offenseFacade = new OffenseFacadeImpl(offenseDao);
-
         tableView.getItems().clear();
         if (student != null) {
-            List<Offense> allOffenses = offenseFacade.getAllOffenses();
-            List<Offense> studentOffenses = getOffensesByStudentId(allOffenses);
+
+            List<Offense> studentOffenses = offenseFacade.getAllOffenseByStudentId(student);
 
             // Compute total comm serv hours
             int totalCommServHours = computeTotalCommServHours(studentOffenses);
@@ -87,13 +90,20 @@ public class SearchOffenseController implements Initializable {
         violationIdColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getViolation().getViolation()));
         violationIdColumn.getStyleClass().addAll("violation-id-column");
 
-        TableColumn<Offense, String> studIdColumn = new TableColumn<>("STUDENT");
+        TableColumn<Offense, String> studIdColumn = new TableColumn<>("STUDENT ID");
         studIdColumn.setCellValueFactory(cellData -> {
+            String studentId = cellData.getValue().getStudent().getStudentId();
+            return new SimpleStringProperty(studentId);
+        });
+        studIdColumn.getStyleClass().addAll("student-column");
+
+        TableColumn<Offense, String> studColumn = new TableColumn<>("NAME");
+        studColumn.setCellValueFactory(cellData -> {
             String firstName = cellData.getValue().getStudent().getFirstName();
             String lastName = cellData.getValue().getStudent().getLastName();
             return new SimpleStringProperty(firstName + " " + lastName);
         });
-        studIdColumn.getStyleClass().addAll("student-id-column");
+        studColumn.getStyleClass().addAll("student-column");
 
         TableColumn<Offense, Timestamp> offenseDateColumn = new TableColumn<>("OFFENSE DATE");
         offenseDateColumn.setCellValueFactory(new PropertyValueFactory<>("offenseDate"));
@@ -117,7 +127,7 @@ public class SearchOffenseController implements Initializable {
                         setGraphic(null);
                         setText(null);
                     } else {
-                        editButton_2.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/images/pencil.png"))));
+                        editButton_2.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/assets/pencil.png"))));
                         editButton_2.setOnAction(event -> {
                             Offense offense = getTableView().getItems().get(getIndex());
                             showEditOffense(offense, (ActionEvent) event);
@@ -133,19 +143,9 @@ public class SearchOffenseController implements Initializable {
             return cellInstance;
         });
 
-        tableView.getColumns().addAll(offenseIdColumn, violationIdColumn, studIdColumn, offenseDateColumn, csHoursColumn, actionColumn);
+        tableView.getColumns().addAll(offenseIdColumn, violationIdColumn, studIdColumn, studColumn, offenseDateColumn, csHoursColumn, actionColumn);
     }
 
-    private List<Offense> getOffensesByStudentId(List<Offense> allOffenses) {
-        List<Offense> studentOffenses = new ArrayList<>();
-        for (Offense offense : allOffenses) {
-            if (offense.getStudent().equals(student)) {
-                studentOffenses.add(offense);
-                System.out.println(offense);
-            }
-        }
-        return studentOffenses;
-    }
 
     private int computeTotalCommServHours(List<Offense> studentOffenses) {
         int totalCommServHours = 0;

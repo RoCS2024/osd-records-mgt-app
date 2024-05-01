@@ -1,5 +1,6 @@
 package com.prefect.user.management.app.controllers.modal;
 
+import com.prefect.office.record.management.PrefectOfficeRecordMgtApplication;
 import com.prefect.office.record.management.appl.facade.prefect.offense.OffenseFacade;
 import com.prefect.office.record.management.appl.facade.prefect.offense.impl.OffenseFacadeImpl;
 import com.prefect.office.record.management.appl.facade.prefect.violation.ViolationFacade;
@@ -8,6 +9,7 @@ import com.prefect.office.record.management.appl.model.offense.Offense;
 import com.prefect.office.record.management.appl.model.violation.Violation;
 import com.prefect.office.record.management.data.dao.prefect.offense.OffenseDao;
 import com.prefect.office.record.management.data.dao.prefect.offense.impl.OffenseDaoImpl;
+import com.student.information.management.StudentInfoMgtApplication;
 import com.student.information.management.appl.facade.student.StudentFacade;
 import com.student.information.management.appl.facade.student.impl.StudentFacadeImpl;
 import com.student.information.management.appl.model.student.Student;
@@ -40,15 +42,21 @@ public class AddOffenseController {
 
     private OffenseFacade offenseFacade;
 
+    private ViolationFacade violationFacade;
+
+    private StudentFacade studentFacade;
+
     @FXML
     protected void saveAddClicked(ActionEvent event) {
-        OffenseDao offenseDao = new OffenseDaoImpl();
-        offenseFacade = new OffenseFacadeImpl(offenseDao);
+        PrefectOfficeRecordMgtApplication app = new PrefectOfficeRecordMgtApplication();
+        offenseFacade = app.getOffenseFacade();
+        violationFacade = app.getViolationFacade();
 
-        ViolationFacade violationFacade = new ViolationFacadeImpl();
         Violation violation = violationFacade.getViolationByID(Integer.parseInt(violationIdField.getText()));
 
-        StudentFacade studentFacade = new StudentFacadeImpl();
+        StudentInfoMgtApplication appl = new StudentInfoMgtApplication();
+        studentFacade = appl.getStudentFacade();
+
         Student student = studentFacade.getStudentById(studentIdField.getText());
 
         Offense addOffense = new Offense();
