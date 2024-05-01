@@ -1,5 +1,6 @@
 package com.prefect.user.management.app.controllers.modal;
 
+import com.prefect.office.record.management.PrefectOfficeRecordMgtApplication;
 import com.prefect.office.record.management.appl.facade.prefect.communityservice.CommunityServiceFacade;
 import com.prefect.office.record.management.appl.facade.prefect.communityservice.impl.CommunityServiceFacadeImpl;
 import com.prefect.office.record.management.appl.facade.prefect.offense.OffenseFacade;
@@ -10,6 +11,9 @@ import com.prefect.office.record.management.data.dao.prefect.communityservice.Co
 import com.prefect.office.record.management.data.dao.prefect.communityservice.impl.CommunityServiceDaoImpl;
 import com.prefect.office.record.management.data.dao.prefect.offense.OffenseDao;
 import com.prefect.office.record.management.data.dao.prefect.offense.impl.OffenseDaoImpl;
+import com.student.information.management.StudentInfoMgtApplication;
+import com.student.information.management.appl.facade.student.StudentFacade;
+import com.student.information.management.appl.model.student.Student;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -47,19 +51,24 @@ public class RenderCsByStudentController {
 
     private OffenseFacade offenseFacade;
 
+    private StudentFacade studentFacade;
+
     //click save button to save rendered cs to database
     @FXML
     protected void saveRenderClicked(ActionEvent event) {
-        OffenseDao offenseDao = new OffenseDaoImpl();
-        offenseFacade = new OffenseFacadeImpl(offenseDao);
-
-        CommunityServiceDao communityServiceDao = new CommunityServiceDaoImpl();
-        communityServiceFacade = new CommunityServiceFacadeImpl(communityServiceDao);
+        PrefectOfficeRecordMgtApplication app = new PrefectOfficeRecordMgtApplication();
+        communityServiceFacade = app.getCommunityserviceFacade();
+        offenseFacade = app.getOffenseFacade();
 
         Offense existingOffense = offenseFacade.getOffenseByID(Integer.parseInt(offenseIdField.getText()));
         if (existingOffense != null) {
             CommunityService renderCs = new CommunityService();
-            renderCs.setStudent_id(studentIdField.getText());
+
+            StudentInfoMgtApplication appl = new StudentInfoMgtApplication();
+            studentFacade = appl.getStudentFacade();
+            Student student = studentFacade.getStudentById(studentIdField.getText());
+            renderCs.setStudent(student);
+
 
             LocalDate selectedDate = dateRenderedField.getValue();
             if (selectedDate != null) {

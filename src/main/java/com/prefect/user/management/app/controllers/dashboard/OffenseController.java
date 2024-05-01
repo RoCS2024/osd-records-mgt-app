@@ -1,5 +1,6 @@
 package com.prefect.user.management.app.controllers.dashboard;
 
+import com.prefect.office.record.management.PrefectOfficeRecordMgtApplication;
 import com.prefect.office.record.management.appl.facade.prefect.offense.impl.OffenseFacadeImpl;
 import com.prefect.office.record.management.appl.model.offense.Offense;
 import com.prefect.office.record.management.appl.facade.prefect.offense.*;
@@ -8,6 +9,7 @@ import com.prefect.office.record.management.data.dao.prefect.offense.OffenseDao;
 import com.prefect.office.record.management.data.dao.prefect.offense.impl.OffenseDaoImpl;
 import com.prefect.user.management.app.controllers.modal.EditOffenseController;
 import com.prefect.user.management.app.controllers.search.SearchOffenseController;
+import com.student.information.management.StudentInfoMgtApplication;
 import com.student.information.management.appl.facade.student.StudentFacade;
 import com.student.information.management.appl.facade.student.impl.StudentFacadeImpl;
 import com.student.information.management.appl.model.student.Student;
@@ -70,10 +72,14 @@ public class OffenseController implements Initializable {
 
     private OffenseFacade offenseFacade;
 
+    private StudentFacade studentFacade;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        OffenseDao offenseDao = new OffenseDaoImpl();
-        offenseFacade = new OffenseFacadeImpl(offenseDao);
+
+        PrefectOfficeRecordMgtApplication app = new PrefectOfficeRecordMgtApplication();
+
+        offenseFacade = app.getOffenseFacade();
 
         tableView.getItems().clear();
         List<Offense> offenses = offenseFacade.getAllOffenses();
@@ -88,13 +94,21 @@ public class OffenseController implements Initializable {
         violationIdColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getViolation().getViolation()));
         violationIdColumn.getStyleClass().addAll("violation-id-column");
 
-        TableColumn<Offense, String> studIdColumn = new TableColumn<>("STUDENT");
+        TableColumn<Offense, String> studIdColumn = new TableColumn<>("STUDENT ID");
         studIdColumn.setCellValueFactory(cellData -> {
+            String studentId = cellData.getValue().getStudent().getStudentId();
+            return new SimpleStringProperty(studentId);
+        });
+        studIdColumn.getStyleClass().addAll("student-column");
+
+        TableColumn<Offense, String> studColumn = new TableColumn<>("NAME");
+        studColumn.setCellValueFactory(cellData -> {
             String firstName = cellData.getValue().getStudent().getFirstName();
             String lastName = cellData.getValue().getStudent().getLastName();
             return new SimpleStringProperty(firstName + " " + lastName);
         });
-        studIdColumn.getStyleClass().addAll("student-id-column");
+        studColumn.getStyleClass().addAll("student-column");
+
 
         TableColumn<Offense, Timestamp> offenseDateColumn = new TableColumn<>("OFFENSE DATE");
         offenseDateColumn.setCellValueFactory(new PropertyValueFactory<>("offenseDate"));
@@ -134,7 +148,7 @@ public class OffenseController implements Initializable {
             return cellInstance;
         });
 
-        tableView.getColumns().addAll(offenseIdColumn, violationIdColumn, studIdColumn, offenseDateColumn, csHoursColumn, actionColumn);
+        tableView.getColumns().addAll(offenseIdColumn, violationIdColumn, studIdColumn, studColumn, offenseDateColumn, csHoursColumn, actionColumn);
     }
 
     private Callback<TableColumn<Offense, Timestamp>, TableCell<Offense, Timestamp>> getDateCellFactory() {
@@ -310,8 +324,12 @@ public class OffenseController implements Initializable {
     //for search
     @FXML
     private void handleSearchButton(ActionEvent event) {
-        StudentFacade studentFacade = new StudentFacadeImpl();
+        StudentInfoMgtApplication app = new StudentInfoMgtApplication();
+        studentFacade = app.getStudentFacade();
+
         Student student = studentFacade.getStudentById(searchField.getText());
+        System.out.println("Student ID: " + searchField.getText());
+        System.out.println("Student ID: " + student.getStudentId());
 
         if(student != null){
             System.out.println("Student ID: " + student.getStudentId());

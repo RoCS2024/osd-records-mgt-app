@@ -1,15 +1,19 @@
 package com.prefect.user.management.app.controllers.dashboard;
 
+import com.prefect.office.record.management.PrefectOfficeRecordMgtApplication;
 import com.prefect.office.record.management.appl.model.communityservice.CommunityService;
 import com.prefect.office.record.management.appl.facade.prefect.communityservice.CommunityServiceFacade;
 import com.prefect.office.record.management.appl.facade.prefect.communityservice.impl.CommunityServiceFacadeImpl;
+import com.prefect.office.record.management.appl.model.offense.Offense;
 import com.prefect.office.record.management.data.dao.prefect.communityservice.impl.CommunityServiceDaoImpl;
 
 import com.prefect.user.management.app.controllers.search.SearchHistoryController;
 import com.prefect.user.management.app.controllers.search.SearchOffenseController;
+import com.student.information.management.StudentInfoMgtApplication;
 import com.student.information.management.appl.facade.student.StudentFacade;
 import com.student.information.management.appl.facade.student.impl.StudentFacadeImpl;
 import com.student.information.management.appl.model.student.Student;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -59,18 +63,34 @@ public class CsHistoryController implements Initializable{
     @FXML
     TableView table;
 
-    private CommunityServiceFacade communityServiceFacade = new CommunityServiceFacadeImpl(new CommunityServiceDaoImpl());
+    private CommunityServiceFacade communityServiceFacade;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        PrefectOfficeRecordMgtApplication app = new PrefectOfficeRecordMgtApplication();
+
+        communityServiceFacade = app.getCommunityserviceFacade();
+
         table.getItems().clear();
         List<CommunityService> communityServices = communityServiceFacade.getAllCs();
         ObservableList<CommunityService> data = FXCollections.observableArrayList(communityServices);
         table.setItems(data);
 
         TableColumn<CommunityService, String> studIdColumn = new TableColumn<>("STUDENT ID");
-        studIdColumn.setCellValueFactory(new PropertyValueFactory<>("student_id"));
-        studIdColumn.getStyleClass().addAll("student-id-column");
+        studIdColumn.setCellValueFactory(cellData -> {
+            String studentId = cellData.getValue().getStudent().getStudentId();
+            return new SimpleStringProperty(studentId);
+        });
+        studIdColumn.getStyleClass().addAll("student-column");
+
+        TableColumn<CommunityService, String> studColumn = new TableColumn<>("NAME");
+        studColumn.setCellValueFactory(cellData -> {
+            String firstName = cellData.getValue().getStudent().getFirstName();
+            String lastName = cellData.getValue().getStudent().getLastName();
+            return new SimpleStringProperty(firstName + " " + lastName);
+        });
+        studColumn.getStyleClass().addAll("student-column");
 
         TableColumn<CommunityService, Timestamp> dateRenderedColumn = new TableColumn<>("DATE RENDERED");
         dateRenderedColumn.setCellValueFactory(new PropertyValueFactory<>("date_rendered"));
@@ -81,7 +101,7 @@ public class CsHistoryController implements Initializable{
         hoursRendered.setCellValueFactory(new PropertyValueFactory<>("hours_rendered"));
         hoursRendered.getStyleClass().addAll("hours-column");
 
-        table.getColumns().addAll(studIdColumn, dateRenderedColumn, hoursRendered);
+        table.getColumns().addAll(studIdColumn, studColumn, dateRenderedColumn, hoursRendered);
     }
 
     private Callback<TableColumn<CommunityService, Timestamp>, TableCell<CommunityService, Timestamp>> getDateCellFactory() {
@@ -185,15 +205,19 @@ public class CsHistoryController implements Initializable{
     //for search
     @FXML
     private void handleSearchButton(ActionEvent event) {
-       String studentId = searchField.getText();
+        String studentId = searchField.getText();
 
-        if(studentId != null){
-            System.out.println("Student ID: " + studentId);
+        StudentInfoMgtApplication app = new StudentInfoMgtApplication();
+        StudentFacade studentFacade = app.getStudentFacade();
+        Student student = studentFacade.getStudentById(studentId);
+
+        if(student != null){
+            System.out.println("Student ID: " + student);
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/SearchHistory.fxml"));
 
                 SearchHistoryController searchHistoryController = new SearchHistoryController();
-                searchHistoryController.initData(studentId);
+                searchHistoryController.initData(student);
                 loader.setController(searchHistoryController);
                 Parent root = loader.load();
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();

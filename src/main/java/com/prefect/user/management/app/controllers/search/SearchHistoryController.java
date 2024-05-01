@@ -1,11 +1,13 @@
 package com.prefect.user.management.app.controllers.search;
 
+import com.prefect.office.record.management.PrefectOfficeRecordMgtApplication;
 import com.prefect.office.record.management.appl.facade.prefect.communityservice.CommunityServiceFacade;
 import com.prefect.office.record.management.appl.facade.prefect.communityservice.impl.CommunityServiceFacadeImpl;
 import com.prefect.office.record.management.appl.model.communityservice.CommunityService;
 import com.prefect.office.record.management.appl.model.offense.Offense;
 import com.prefect.office.record.management.data.dao.prefect.communityservice.impl.CommunityServiceDaoImpl;
 import com.student.information.management.appl.model.student.Student;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -43,23 +45,24 @@ public class SearchHistoryController implements Initializable {
     @FXML
     private Button previousButton;
 
-    private CommunityServiceFacade communityServiceFacade = new CommunityServiceFacadeImpl(new CommunityServiceDaoImpl());
+    private CommunityServiceFacade communityServiceFacade;
 
-    private String studentId;
+    private Student student;
 
 
-    public void initData(String studentId) {
-        this.studentId = studentId;
-    }
+    public void initData(Student student) {this.student = student; }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        PrefectOfficeRecordMgtApplication app = new PrefectOfficeRecordMgtApplication();
+        communityServiceFacade = app.getCommunityserviceFacade();
+
         previousButton.setOnAction(event -> {handleBack2Previous((ActionEvent) event);});
 
-        if (studentId != null) {
+        if (student != null) {
             table.getItems().clear();
-            List<CommunityService> communityServices = communityServiceFacade.getAllCs();
-            List<CommunityService> communityServiceByStudId  = getCsByStudentId(communityServices);
+
+            List<CommunityService> communityServiceByStudId = communityServiceFacade.getAllCsByStudentId(student);
 
             int totalHoursRendered = computeTotalHoursRendered(communityServiceByStudId);
             totalField.setText(String.valueOf(totalHoursRendered));
@@ -71,8 +74,19 @@ public class SearchHistoryController implements Initializable {
         }
 
         TableColumn<CommunityService, String> studIdColumn = new TableColumn<>("STUDENT ID");
-        studIdColumn.setCellValueFactory(new PropertyValueFactory<>("student_id"));
-        studIdColumn.getStyleClass().addAll("student-id-column");
+        studIdColumn.setCellValueFactory(cellData -> {
+            String studentId = cellData.getValue().getStudent().getStudentId();
+            return new SimpleStringProperty(studentId);
+        });
+        studIdColumn.getStyleClass().addAll("student-column");
+
+        TableColumn<CommunityService, String> studColumn = new TableColumn<>("NAME");
+        studColumn.setCellValueFactory(cellData -> {
+            String firstName = cellData.getValue().getStudent().getFirstName();
+            String lastName = cellData.getValue().getStudent().getLastName();
+            return new SimpleStringProperty(firstName + " " + lastName);
+        });
+        studColumn.getStyleClass().addAll("student-column");
 
         TableColumn<CommunityService, Timestamp> dateRenderedColumn = new TableColumn<>("DATE RENDERED");
         dateRenderedColumn.setCellValueFactory(new PropertyValueFactory<>("date_rendered"));
@@ -83,7 +97,7 @@ public class SearchHistoryController implements Initializable {
         hoursRendered.setCellValueFactory(new PropertyValueFactory<>("hours_rendered"));
         hoursRendered.getStyleClass().addAll("hours-column");
 
-        table.getColumns().addAll(studIdColumn, dateRenderedColumn, hoursRendered);
+        table.getColumns().addAll(studIdColumn, studColumn, dateRenderedColumn, hoursRendered);
     }
 
     private Callback<TableColumn<CommunityService, Timestamp>, TableCell<CommunityService, Timestamp>> getDateCellFactory() {
@@ -111,15 +125,6 @@ public class SearchHistoryController implements Initializable {
         return totalHoursRendered;
     }
 
-    private List<CommunityService> getCsByStudentId(List<CommunityService> communityServices) {
-        List<CommunityService> communityServiceByStudId = new ArrayList<>();
-        for (CommunityService communityService : communityServices) {
-            if (communityService.getStudent_id().equals(studentId)) {
-                communityServiceByStudId.add(communityService);
-            }
-        }
-        return communityServiceByStudId;
-    }
 
     @FXML
     protected void handleBack2Previous(ActionEvent event) {

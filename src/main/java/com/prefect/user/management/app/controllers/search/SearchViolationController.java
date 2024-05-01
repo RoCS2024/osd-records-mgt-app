@@ -1,5 +1,6 @@
 package com.prefect.user.management.app.controllers.search;
 
+import com.prefect.office.record.management.PrefectOfficeRecordMgtApplication;
 import com.prefect.office.record.management.appl.facade.prefect.violation.ViolationFacade;
 import com.prefect.office.record.management.appl.facade.prefect.violation.impl.ViolationFacadeImpl;
 import com.prefect.office.record.management.appl.model.violation.Violation;
@@ -39,23 +40,25 @@ public class SearchViolationController implements Initializable {
 
     @FXML
     private Button previousButton;
-    private ViolationFacade violationFacade = new ViolationFacadeImpl();
+    private ViolationFacade violationFacade;
 
-    private int violationId;
+    private String violationName;
 
-    public void initData(int violationId) {
-        this.violationId = violationId;
+    public void initData(String violationName) {
+        this.violationName = violationName;
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        PrefectOfficeRecordMgtApplication app = new PrefectOfficeRecordMgtApplication();
+        violationFacade = app.getViolationFacade();
+
         previousButton.setOnAction(event -> {handleBack2Previous((ActionEvent) event);});
 
         table.getItems().clear();
-        List<Violation> violations = violationFacade.getAllViolation();
-        Violation violationByIdList = violationFacade.getViolationByID(violationId);
+        Violation violationByName = violationFacade.getViolationByName(violationName);
 
-        ObservableList<Violation> data = FXCollections.observableArrayList(violationByIdList);
+        ObservableList<Violation> data = FXCollections.observableArrayList(violationByName);
         table.setItems(data);
 
         TableColumn violationColumn = new TableColumn("VIOLATION");

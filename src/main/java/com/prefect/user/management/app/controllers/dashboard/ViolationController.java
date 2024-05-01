@@ -1,5 +1,6 @@
 package com.prefect.user.management.app.controllers.dashboard;
 
+import com.prefect.office.record.management.PrefectOfficeRecordMgtApplication;
 import com.prefect.office.record.management.appl.facade.prefect.violation.impl.ViolationFacadeImpl;
 import com.prefect.office.record.management.appl.model.violation.Violation;
 import com.prefect.office.record.management.appl.facade.prefect.violation.*;
@@ -36,6 +37,7 @@ import javafx.stage.StageStyle;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -52,6 +54,9 @@ public class ViolationController implements Initializable {
 
     private boolean sidebarVisible = false;
 
+    @FXML
+    private ComboBox<String> filterBox;
+
     //for search
     @FXML
     private TextField searchField;
@@ -60,14 +65,31 @@ public class ViolationController implements Initializable {
     @FXML
     TableView table;
 
-    private ViolationFacade violationFacade = new ViolationFacadeImpl();
+    private ViolationFacade violationFacade;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        table.getItems().clear();
-        List<Violation> violations = violationFacade.getAllViolation();
+        filterBox.getItems().addAll("All", "Minor", "Major");
+        filterBox.setValue("All");
 
+        PrefectOfficeRecordMgtApplication app = new PrefectOfficeRecordMgtApplication();
+        violationFacade = app.getViolationFacade();
+
+        List<Violation> violations = violationFacade.getAllViolation();
         ObservableList<Violation> data = FXCollections.observableArrayList(violations);
+
+        setupTable(data);
+
+        filterBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            List<Violation> filteredViolations = filterViolations(newValue);
+            ObservableList<Violation> filteredData = FXCollections.observableArrayList(filteredViolations);
+
+            setupTable(filteredData);
+        });
+    }
+
+    private void setupTable(ObservableList<Violation> data) {
+        table.getItems().clear();
         table.setItems(data);
 
         TableColumn violationColumn = new TableColumn("VIOLATION");
@@ -111,8 +133,21 @@ public class ViolationController implements Initializable {
             return cellInstance;
         });
 
-        table.getColumns().addAll(violationColumn, violationTypeColumn, totalCsHoursColumn, actionColumn);
+        table.getColumns().setAll(violationColumn, violationTypeColumn, totalCsHoursColumn, actionColumn);
     }
+
+    private List<Violation> filterViolations(String filter) {
+        if (filter.equals("All")) {
+            return violationFacade.getAllViolation();
+        } else if (filter.equals("Minor")) {
+            return violationFacade.getAllViolationByType("Minor");
+        } else if (filter.equals("Major")) {
+            return violationFacade.getAllViolationByType("Major");
+        }
+        //empty return
+        return new ArrayList<>();
+    }
+
 
     @FXML
     protected void handleSubmitAddViolationButton(ActionEvent event) {
@@ -245,14 +280,14 @@ public class ViolationController implements Initializable {
     //for search
     @FXML
     private void handleSearchButton(ActionEvent event) {
-        int violationId = Integer.parseInt(searchField.getText());
+        String violationName = searchField.getText();
 
-        System.out.println("Violation ID: " + violationId);
+        System.out.println("Violation Name: " + violationName);
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/SearchViolation.fxml"));
 
             SearchViolationController searchViolationController = new SearchViolationController();
-            searchViolationController.initData(violationId);
+            searchViolationController.initData(violationName);
             loader.setController(searchViolationController);
             Parent root = loader.load();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
