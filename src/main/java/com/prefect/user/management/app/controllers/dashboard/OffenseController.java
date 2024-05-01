@@ -245,14 +245,6 @@ public class OffenseController implements Initializable {
         showDashboard2();
     }
 
-    @FXML
-    protected void handleSubmitRenderCSButton(ActionEvent event) {
-        Stage stage3 = (Stage) ((Node)event.getSource()).getScene().getWindow();
-        stage3.hide();
-        showDashboard3();
-    }
-
-
     private void showDashboard2() {
         try {
             Stage dashboardStage2 = new Stage();
@@ -269,21 +261,6 @@ public class OffenseController implements Initializable {
         }
     }
 
-    private void showDashboard3() {
-        try {
-            Stage dashboardStage3 = new Stage();
-            dashboardStage3.initStyle(StageStyle.UNDECORATED);
-
-            FXMLLoader loader3 = new FXMLLoader();
-            loader3.setLocation(getClass().getResource("/views/RenderCS.fxml"));
-            Parent root3 = loader3.load();
-            Scene scene3 = new Scene(root3);
-            dashboardStage3.setScene(scene3);
-            dashboardStage3.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     private void showEditOffense(Offense offense, ActionEvent event) {
         try {

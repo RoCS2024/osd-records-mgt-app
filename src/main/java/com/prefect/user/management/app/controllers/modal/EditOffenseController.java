@@ -38,7 +38,7 @@ public class EditOffenseController {
     private TextField studentIdField;
 
     @FXML
-    private TextField violationIdField;
+    private TextField violationField;
 
     @FXML
     private DatePicker offenseDateField;
@@ -57,7 +57,7 @@ public class EditOffenseController {
         offenseFacade = app.getOffenseFacade();
         violationFacade = app.getViolationFacade();
 
-        Violation violation = violationFacade.getViolationByID(Integer.parseInt(violationIdField.getText()));
+        Violation violation = violationFacade.getViolationByName(violationField.getText());
 
         StudentInfoMgtApplication appl = new StudentInfoMgtApplication();
         studentFacade = appl.getStudentFacade();
@@ -115,7 +115,7 @@ public class EditOffenseController {
         offenseIdField.setText(String.valueOf(offense.getId()));
 
         studentIdField.setText(offense.getStudent().getStudentId());
-        violationIdField.setText(String.valueOf(offense.getViolation().getId()));
+        violationField.setText(offense.getViolation().getViolation());
 
         //date picker format setter
         Timestamp offenseTimestamp = offense.getOffenseDate();

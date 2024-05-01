@@ -1,6 +1,7 @@
 package com.prefect.user.management.app.controllers.search;
 
 import com.prefect.office.record.management.PrefectOfficeRecordMgtApplication;
+import com.prefect.office.record.management.appl.facade.prefect.communityservice.CommunityServiceFacade;
 import com.prefect.office.record.management.appl.facade.prefect.offense.OffenseFacade;
 import com.prefect.office.record.management.appl.facade.prefect.offense.impl.OffenseFacadeImpl;
 import com.prefect.office.record.management.appl.model.communityservice.CommunityService;
@@ -45,11 +46,16 @@ public class SearchOffenseController implements Initializable {
     private TextField totalField;
 
     @FXML
+    private TextField remainingField;
+    @FXML
     private TableView<Offense> tableView;
 
     @FXML
     private Button previousButton;
+    @FXML
+    private Button renderBtn;
     private OffenseFacade offenseFacade;
+    private CommunityServiceFacade communityServiceFacade;
     private Student student;
 
     public void initData(Student student) {
@@ -62,8 +68,10 @@ public class SearchOffenseController implements Initializable {
 
         PrefectOfficeRecordMgtApplication app = new PrefectOfficeRecordMgtApplication();
         offenseFacade = app.getOffenseFacade();
+        communityServiceFacade = app.getCommunityserviceFacade();
 
         previousButton.setOnAction(event -> {handleBack2Previous((ActionEvent) event);});
+        renderBtn.setOnAction(event -> {handleSubmitRenderCSButton((ActionEvent) event);});
         System.out.println("student data passed: " + student.getStudentId());
 
         tableView.getItems().clear();
@@ -75,6 +83,16 @@ public class SearchOffenseController implements Initializable {
             int totalCommServHours = computeTotalCommServHours(studentOffenses);
             totalField.setText(String.valueOf(totalCommServHours));
 
+            List<CommunityService> communityServiceByStudId = communityServiceFacade.getAllCsByStudentId(student);
+
+            int totalHoursRendered = computeTotalHoursRendered(communityServiceByStudId);
+            int remainingHours = totalCommServHours - totalHoursRendered;
+            remainingField.setText(String.valueOf(remainingHours));
+
+            if (remainingHours <= 0) {
+                remainingField.setText(String.valueOf("0"));
+                renderBtn.setDisable(true);
+            }
             // Populate the TableView
             ObservableList<Offense> data = FXCollections.observableArrayList(studentOffenses);
             tableView.setItems(data);
@@ -155,6 +173,14 @@ public class SearchOffenseController implements Initializable {
         return totalCommServHours;
     }
 
+    private int computeTotalHoursRendered(List<CommunityService> communityServiceByStudId) {
+        int totalHoursRendered = 0;
+        for (CommunityService communityService : communityServiceByStudId) {
+            totalHoursRendered += communityService.getHours_rendered();
+        }
+        return totalHoursRendered;
+    }
+
 
     //change the offense date column
     private Callback<TableColumn<Offense, Timestamp>, TableCell<Offense, Timestamp>> getDateCellFactory() {
@@ -187,7 +213,7 @@ public class SearchOffenseController implements Initializable {
             dashboardStage3.initStyle(StageStyle.UNDECORATED);
 
             FXMLLoader loader3 = new FXMLLoader();
-            loader3.setLocation(getClass().getResource("/views/RenderCS.fxml"));
+            loader3.setLocation(getClass().getResource("/views/RenderCsByStudent.fxml"));
             Parent root3 = loader3.load();
             Scene scene3 = new Scene(root3);
             dashboardStage3.setScene(scene3);
