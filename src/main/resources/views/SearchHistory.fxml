@@ -87,7 +87,7 @@
                                                     </rowConstraints>
                                                     <children>
                                                         <TextField fx:id="totalField" disable="true" prefHeight="30.0" prefWidth="50.0" promptText="00" style="-fx-background-color: #f0f0f0; -fx-border-radius: 5; -fx-border-color: #999999;" GridPane.columnIndex="1" />
-                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Total Community Service Hours:" GridPane.halignment="RIGHT">
+                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Total Community Service Hours Rendered:" GridPane.halignment="RIGHT">
                                                             <GridPane.margin>
                                                                 <Insets right="20.0" />
                                                             </GridPane.margin>

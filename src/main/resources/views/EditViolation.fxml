@@ -30,7 +30,7 @@
                                 <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
                                 <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
                                 <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
                             </rowConstraints>
                             <children>
                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="EDIT VIOLATION" textAlignment="CENTER" wrappingWidth="360.0" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
@@ -113,26 +113,26 @@
                                         </TextField>
                                     </children>
                                 </GridPane>
-                        <GridPane GridPane.rowIndex="1">
-                           <columnConstraints>
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                           </columnConstraints>
-                           <rowConstraints>
-                              <RowConstraints minHeight="10.0" prefHeight="15.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                           </rowConstraints>
-                           <children>
-                              <TextField fx:id="violationIdField" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="40.0" prefWidth="300.0" promptText="Enter Violation ID" style="-fx-background-color: #f0f0f0; -fx-border-color: #999999; -fx-border-radius: 5;" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="TOP">
-                                 <padding>
-                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                 </padding>
-                                 <cursor>
-                                    <Cursor fx:constant="TEXT" />
-                                 </cursor>
-                              </TextField>
-                              <Label prefWidth="300.0" text="Violation ID:" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM" />
-                           </children>
-                        </GridPane>
+                                <GridPane GridPane.rowIndex="1">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="15.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    </rowConstraints>
+                                    <children>
+                                        <TextField fx:id="violationIdField" disable="true" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="40.0" prefWidth="300.0" promptText="Enter Violation ID" style="-fx-background-color: #f0f0f0; -fx-border-color: #999999; -fx-border-radius: 5;" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="TOP">
+                                            <padding>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                            </padding>
+                                            <cursor>
+                                                <Cursor fx:constant="TEXT" />
+                                            </cursor>
+                                        </TextField>
+                                        <Label prefWidth="300.0" text="Violation ID:" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM" />
+                                    </children>
+                                </GridPane>
                             </children>
                         </GridPane>
                     </children>

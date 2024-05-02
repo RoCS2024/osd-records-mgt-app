@@ -132,7 +132,7 @@ public class RenderCsByStudentController {
 
             Stage dashboardStage3 = new Stage();
             FXMLLoader loader3 = new FXMLLoader();
-            loader3.setLocation(getClass().getResource("/views/SearchStudentOffense.fxml"));
+            loader3.setLocation(getClass().getResource("/views/OffenseList.fxml"));
             Parent root3 = loader3.load();
             Scene scene3 = new Scene(root3);
             dashboardStage3.setScene(scene3);
