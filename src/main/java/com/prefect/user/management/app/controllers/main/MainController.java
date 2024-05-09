@@ -3,6 +3,8 @@ package com.prefect.user.management.app.controllers.main;
 import com.user.management.appl.facade.user.UserFacade;
 import com.user.management.appl.facade.user.impl.UserFacadeImpl;
 import com.user.management.appl.model.user.User;
+import com.user.management.data.user.dao.UserDao;
+import com.user.management.data.user.dao.impl.UserDaoImpl;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -35,7 +37,7 @@ public class MainController {
 
     private User user;
 
-    private UserFacade userFacade = new UserFacadeImpl();
+    UserDao userFacade = new UserDaoImpl();
 
     @FXML
     protected void logButtonOnAction(ActionEvent event) {

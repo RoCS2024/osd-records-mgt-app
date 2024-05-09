@@ -3,6 +3,8 @@ package com.prefect.user.management.app.controllers.modal;
 import com.user.management.appl.facade.user.UserFacade;
 import com.user.management.appl.facade.user.impl.UserFacadeImpl;
 import com.user.management.appl.model.user.User;
+import com.user.management.data.user.dao.UserDao;
+import com.user.management.data.user.dao.impl.UserDaoImpl;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -43,7 +45,7 @@ public class ForgotPswController {
 
     private User user;
 
-    private UserFacade userFacade = new UserFacadeImpl();
+    UserDao userFacade = new UserDaoImpl();
 
     @FXML
     protected void saveForgotPswClicked(ActionEvent event) {
@@ -56,7 +58,7 @@ public class ForgotPswController {
         String newPassword  = newPswField.getText();
 
         try {
-            userFacade.forgotPassword(username, nickname, newPassword);
+            userFacade.forgotPassword(username, newPassword);
         } catch(Exception ex) {
             ex.printStackTrace();;
         }
