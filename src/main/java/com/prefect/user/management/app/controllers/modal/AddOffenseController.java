@@ -13,6 +13,8 @@ import com.student.information.management.StudentInfoMgtApplication;
 import com.student.information.management.appl.facade.student.StudentFacade;
 import com.student.information.management.appl.facade.student.impl.StudentFacadeImpl;
 import com.student.information.management.appl.model.student.Student;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -20,15 +22,21 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.net.URL;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class AddOffenseController {
     @FXML
@@ -40,19 +48,40 @@ public class AddOffenseController {
     @FXML
     private DatePicker offenseDateField;
 
+    @FXML
+    private TextField studentNameField;
+
+    @FXML
+    private ComboBox violationComboBox;
+
     private OffenseFacade offenseFacade;
 
     private ViolationFacade violationFacade;
 
     private StudentFacade studentFacade;
+    @FXML
+    public void initialize() {
+        PrefectOfficeRecordMgtApplication appl = new PrefectOfficeRecordMgtApplication();
+        violationFacade = appl.getViolationFacade();
+
+        // Retrieve all violations from the database
+        List<Violation> violations = violationFacade.getAllViolation();
+
+        // Extract violation names from violations
+        List<String> violationNames = violations.stream()
+                .map(Violation::getViolation)
+                .collect(Collectors.toList());
+
+        // Populate the ComboBox with violation names
+        violationComboBox.getItems().addAll(violationNames);
+    }
 
     @FXML
     protected void saveAddClicked(ActionEvent event) {
         PrefectOfficeRecordMgtApplication app = new PrefectOfficeRecordMgtApplication();
         offenseFacade = app.getOffenseFacade();
         violationFacade = app.getViolationFacade();
-
-        Violation violation = violationFacade.getViolationByName(violationField.getText());
+        Violation violation = violationFacade.getViolationByName((String) violationComboBox.getValue());
 
         StudentInfoMgtApplication appl = new StudentInfoMgtApplication();
         studentFacade = appl.getStudentFacade();
@@ -119,4 +148,20 @@ public class AddOffenseController {
             e.printStackTrace();
         }
     }
+    @FXML
+    protected void handleStudentIdChanged(KeyEvent event) {
+
+        if(!studentIdField.getText().isEmpty()){
+            StudentInfoMgtApplication appl = new StudentInfoMgtApplication();
+            studentFacade = appl.getStudentFacade();
+            Student student = studentFacade.getStudentById(studentIdField.getText());
+            if (student != null) {
+                String fullName = student.getLastName() + ", " + student.getFirstName() + " " + student.getMiddleName();
+                studentNameField.setText(fullName);
+            } else {
+                studentNameField.clear();
+            }
+        }
+    }
+
 }

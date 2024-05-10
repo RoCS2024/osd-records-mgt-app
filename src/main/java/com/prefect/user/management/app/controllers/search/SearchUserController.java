@@ -4,6 +4,8 @@ import com.prefect.user.management.app.controllers.modal.ChangePswController;
 import com.user.management.appl.facade.user.UserFacade;
 import com.user.management.appl.facade.user.impl.UserFacadeImpl;
 import com.user.management.appl.model.user.User;
+import com.user.management.data.user.dao.UserDao;
+import com.user.management.data.user.dao.impl.UserDaoImpl;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -43,7 +45,7 @@ public class SearchUserController implements Initializable {
     private int userId;
     @FXML
     private Button previousButton;
-    private final UserFacade userFacade = new UserFacadeImpl();
+    UserDao userFacade = new UserDaoImpl();
     public void initData(int userId) {
         this.userId = userId;
 
