@@ -3,7 +3,7 @@ module com.prefect.user.management.app {
     requires javafx.fxml;
     requires porms;
     requires umsv2;
-    requires rs.sims;
+    requires sims;
     requires java.sql;
     requires org.apache.logging.log4j.slf4j2.impl;
 

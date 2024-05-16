@@ -77,13 +77,13 @@ public class SearchOffenseController implements Initializable {
         tableView.getItems().clear();
         if (student != null) {
 
-            List<Offense> studentOffenses = offenseFacade.getAllOffenseByStudentId(student);
+            List<Offense> studentOffenses = offenseFacade.getAllOffenseByStudent(student);
 
             // Compute total comm serv hours
             int totalCommServHours = computeTotalCommServHours(studentOffenses);
             totalField.setText(String.valueOf(totalCommServHours));
 
-            List<CommunityService> communityServiceByStudId = communityServiceFacade.getAllCsByStudentId(student);
+            List<CommunityService> communityServiceByStudId = communityServiceFacade.getAllCsByStudent(student);
 
             int totalHoursRendered = computeTotalHoursRendered(communityServiceByStudId);
             int remainingHours = totalCommServHours - totalHoursRendered;
