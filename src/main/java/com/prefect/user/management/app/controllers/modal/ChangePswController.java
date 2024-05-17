@@ -11,10 +11,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -70,40 +67,60 @@ public class ChangePswController {
 
     @FXML
     protected void setSaveChangePswClicked(ActionEvent event) {
-        User updatePsw = new User();
-        updatePsw.setUsername(usernameField.getText());
-        updatePsw.setPassword(newPswField.getCharacters().toString());
-
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        updatePsw.setDate_modified(timestamp);
-
-        try {
-            userFacade.updatePassword(updatePsw);
-        } catch(Exception ex) {
-            ex.printStackTrace();;
+        if (!validateFields()) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("All fields are important. Please enter valid input.");
+            alert.showAndWait();
+            return;
         }
-        finally {
-            try {
-                Stage previousStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                previousStage.close();
+        String username = usernameField.getText();
+        String currentPassword = currentPswField.getText();
 
-                Stage dashboardStage = new Stage();
-                FXMLLoader loader = new FXMLLoader();
-                loader.setLocation(getClass().getResource("/views/UserList.fxml"));
+        if (user != null && user.getPassword().equals(currentPassword)) {
+
+            User updatePsw = new User();
+            updatePsw.setUsername(username);
+            updatePsw.setPassword(newPswField.getText());
+
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            updatePsw.setDate_modified(timestamp);
+
+            try {
+                userFacade.updatePassword(updatePsw);
+
+
+                Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                currentStage.close();
+
+
+                Stage userListStage = new Stage();
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/UserList.fxml"));
                 Parent root = loader.load();
                 Scene scene = new Scene(root);
-                dashboardStage.setScene(scene);
-
-                dashboardStage.initStyle(StageStyle.UNDECORATED);
-
-                dashboardStage.show();
-            } catch (Exception e) {
-                e.printStackTrace();
+                userListStage.setScene(scene);
+                userListStage.initStyle(StageStyle.UNDECORATED);
+                userListStage.show();
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
+        } else {
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("Password does not match with your current password.");
+            alert.showAndWait();
         }
     }
+    private boolean validateFields() {
+        return !usernameField.getText().isEmpty() &&
+                !currentPswField.getText().isEmpty() &&
+                !newPswField.getText().isEmpty() &&
+                !confirmPswField.getText().isEmpty();
+    }
 
-    //show password button action
     @FXML
     void changeVisibility(ActionEvent event){
         if(toggleButton.isSelected()){
@@ -194,7 +211,7 @@ public class ChangePswController {
         toggleButton5.setVisible(false);
     }
 
-    //display user info in ui
+
     public void setUser(User user) {
         this.user = user;
         usernameField.setText(user.getUsername());

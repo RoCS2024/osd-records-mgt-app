@@ -11,6 +11,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
@@ -34,6 +35,10 @@ public class AddViolationController implements Initializable {
 
     @FXML
     protected void saveAddViolationClicked(ActionEvent event) {
+        if (!areFieldsValid()) {
+            showAlert("All fields are important. Please enter valid input.");
+            return;
+        }
         PrefectOfficeRecordMgtApplication app = new PrefectOfficeRecordMgtApplication();
         violationFacade = app.getViolationFacade();
 
@@ -73,7 +78,18 @@ public class AddViolationController implements Initializable {
             }
         }
     }
-
+    private boolean areFieldsValid() {
+        return violationField.getText() != null && !violationField.getText().isEmpty()
+                && commServHours.getText() != null && !commServHours.getText().isEmpty()
+                && comboBox.getValue() != null && !comboBox.getValue().isEmpty();
+    }
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Invalid Input");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         comboBox.getItems().addAll("Minor", "Major");
