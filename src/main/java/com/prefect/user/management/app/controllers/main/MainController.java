@@ -43,7 +43,6 @@ public class MainController {
     protected void logButtonOnAction(ActionEvent event) {
         String username = usernameField.getText();
         String password = passwordField.getCharacters().toString();
-        String password2 = passwordShown.getText();
 
         try {
             User currentUser = userFacade.findUserByUsername(username);
@@ -54,7 +53,7 @@ public class MainController {
                 alert.setContentText("Username and password are required.");
                 alert.showAndWait();
 
-            } else if(currentUser != null && password.equals(currentUser.getPassword()) && password2.equals(currentUser.getPassword())) {
+            } else if(currentUser != null && password.equals(currentUser.getPassword()) ) {
                 showAlert("Login Successful", "Welcome " + username + "!", Alert.AlertType.INFORMATION);
                 openDashboardWindow(event);
             }
