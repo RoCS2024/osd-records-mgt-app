@@ -11,6 +11,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import java.util.regex.Pattern;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 
@@ -57,6 +59,10 @@ public class ForgotPswController {
         String nickname = nicknameField.getText();
         String newPassword  = newPswField.getText();
 
+        if (!validateUsername(usernameField.getText())) {
+            showAlert("Invalid Input", "Username should contain only alphanumeric characters.", Alert.AlertType.ERROR);
+            return;
+        }
         try {
             userFacade.forgotPassword(username, newPassword);
         } catch(Exception ex) {
@@ -81,6 +87,18 @@ public class ForgotPswController {
                 e.printStackTrace();
             }
         }
+    }
+    private boolean validateUsername(String username) {
+        return Pattern.matches("[a-zA-Z0-9]+", username);
+    }
+
+    // Method to display an alert
+    private void showAlert(String title, String content, Alert.AlertType alertType) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     @FXML

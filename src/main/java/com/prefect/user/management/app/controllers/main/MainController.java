@@ -44,6 +44,11 @@ public class MainController {
         String username = usernameField.getText();
         String password = passwordField.getCharacters().toString();
 
+        if (!isAlphaNumeric(username) || !isAlphaNumeric(password)) {
+            showAlert("Error", "Please enter valid input. Only alphanumeric characters are allowed.", Alert.AlertType.ERROR);
+            return;
+        }
+
         try {
             User currentUser = userFacade.findUserByUsername(username);
             if (username.isEmpty() || password.isEmpty()) {
@@ -65,7 +70,9 @@ public class MainController {
             ex.printStackTrace();
         }
     }
-
+    private boolean isAlphaNumeric(String input) {
+        return input.matches("^[a-zA-Z0-9]*$");
+    }
     private void showAlert(String title, String content, Alert.AlertType alertType) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
@@ -139,7 +146,6 @@ public class MainController {
         stage = (Stage)((Node)event.getSource()).getScene().getWindow();
         scene = new Scene(root);
         stage.setScene(scene);
-
         stage.show();
     }
 

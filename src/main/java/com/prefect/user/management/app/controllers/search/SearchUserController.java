@@ -16,10 +16,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -42,6 +39,8 @@ public class SearchUserController implements Initializable {
     //for table id
     @FXML
     TableView table;
+    @FXML
+    private TextField entityIdField;
     private int userId;
     @FXML
     private Button previousButton;
@@ -75,6 +74,7 @@ public class SearchUserController implements Initializable {
         TableColumn<User, Integer> entityIdColumn = new TableColumn<>("ENTITY ID");
         entityIdColumn.setCellValueFactory(new PropertyValueFactory<>("entity_id"));
         entityIdColumn.getStyleClass().addAll("entity-id-column");
+        entityIdField.setOnAction(event -> handleSearchByEntityId());
 
         TableColumn<User, Timestamp> dateCreatedColumn = new TableColumn<>("DATE CREATED");
         dateCreatedColumn.setCellValueFactory(new PropertyValueFactory<>("date_created"));
@@ -135,6 +135,24 @@ public class SearchUserController implements Initializable {
         };
     }
 
+    private void handleSearchByEntityId() {
+        String entityIdStr = entityIdField.getText();
+        if (!entityIdStr.isEmpty()) {
+            int entityId = Integer.parseInt(entityIdStr);
+            User user = userFacade.getUserByEntityId(entityId); // Assuming this method exists in UserDao
+            if (user != null) {
+                ObservableList<User> data = FXCollections.observableArrayList(user);
+                table.setItems(data);
+            } else {
+                table.getItems().clear();
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("No User Found");
+                alert.setHeaderText(null);
+                alert.setContentText("No user found with the specified entity ID.");
+                alert.showAndWait();
+            }
+        }
+    }
     //show details in edit button
     private void showEditUser(User user, ActionEvent event) {
         try {
@@ -171,3 +189,5 @@ public class SearchUserController implements Initializable {
         }
     }
 }
+
+

@@ -21,10 +21,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
@@ -74,7 +71,14 @@ public class AddOffenseController {
 
         // Populate the ComboBox with violation names
         violationComboBox.getItems().addAll(violationNames);
+
+        saveButton.disableProperty().bind(studentIdField.textProperty().isEmpty()
+                .or(violationComboBox.valueProperty().isNull())
+                .or(offenseDateField.valueProperty().isNull())
+        );
     }
+    }
+
 
     @FXML
     protected void saveAddClicked(ActionEvent event) {
@@ -91,6 +95,11 @@ public class AddOffenseController {
         Offense addOffense = new Offense();
         addOffense.setStudent(student);
         addOffense.setViolation(violation);
+
+        if (!validateInput()) {
+            showAlert("Error", "All fields are important. Please enter valid input.", Alert.AlertType.ERROR);
+            return;
+        }
 
         LocalDate selectedDate = offenseDateField.getValue();
         if (selectedDate != null) {
@@ -130,6 +139,12 @@ public class AddOffenseController {
             }
         }
     }
+    private boolean validateInput() {
+        return !studentIdField.getText().isEmpty()
+            && violationComboBox.getValue() != null
+            && offenseDateField.getValue() != null;
+}
+
 
     @FXML
     protected void handleCancelAddOffenseClicked(MouseEvent event) {
@@ -164,4 +179,4 @@ public class AddOffenseController {
         }
     }
 
-}
+

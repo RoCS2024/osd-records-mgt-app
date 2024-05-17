@@ -15,13 +15,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -140,6 +138,21 @@ public class SearchViolationController implements Initializable {
             e.printStackTrace();
         }
     }
+}
+@FXML
+protected void validateInput(KeyEvent event) {
+    TextField field = (TextField) event.getSource();
+    if (!field.getText().matches("[a-zA-Z0-9 ]*")) {
+        showAlert("Invalid Input", "Please enter valid input. Special characters are not allowed.", Alert.AlertType.ERROR);
+        field.setText(field.getText().replaceAll("[^a-zA-Z0-9 ]", ""));
+    }
+}
 
-
+private void showAlert(String title, String content, Alert.AlertType alertType) {
+    Alert alert = new Alert(alertType);
+    alert.setTitle(title);
+    alert.setHeaderText(null);
+    alert.setContentText(content);
+    alert.showAndWait();
+}
 }
