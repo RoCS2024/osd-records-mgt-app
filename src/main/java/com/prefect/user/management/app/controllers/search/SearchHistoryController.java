@@ -62,7 +62,7 @@ public class SearchHistoryController implements Initializable {
         if (student != null) {
             table.getItems().clear();
 
-            List<CommunityService> communityServiceByStudId = communityServiceFacade.getAllCsByStudentId(student);
+            List<CommunityService> communityServiceByStudId = communityServiceFacade.getAllCsByStudent(student);
 
             int totalHoursRendered = computeTotalHoursRendered(communityServiceByStudId);
             totalField.setText(String.valueOf(totalHoursRendered));
