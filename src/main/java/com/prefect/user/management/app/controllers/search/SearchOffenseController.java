@@ -65,8 +65,24 @@ public class SearchOffenseController implements Initializable {
 
         previousButton.setOnAction(event -> {handleBack2Previous((ActionEvent) event);});
 
+
         table.getItems().clear();
         Offense offenseByName = offenseFacade.getOffenseByName(offenseName);
+
+        renderBtn.setOnAction(event -> {handleSubmitRenderCSButton((ActionEvent) event);});
+        System.out.println("student data passed: " + student.getStudentId());
+
+        tableView.getItems().clear();
+        if (student != null) {
+
+            List<Offense> studentOffenses = offenseFacade.getAllOffenseByStudent(student);
+
+            // Compute total comm serv hours
+            int totalCommServHours = computeTotalCommServHours(studentOffenses);
+            totalField.setText(String.valueOf(totalCommServHours));
+
+            List<CommunityService> communityServiceByStudId = communityServiceFacade.getAllCsByStudent(student);
+
 
         ObservableList<Offense> data = FXCollections.observableArrayList(offenseByName);
         table.setItems(data);

@@ -11,6 +11,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -40,6 +41,21 @@ public class CreateAccController {
 
     @FXML
     protected void saveRegisterClicked(ActionEvent event) {
+        String username = usernameField.getText();
+        String entityId = entityIdField.getText();
+
+        if (!isValidInput(username, entityId)) {
+            showAlert("Invalid Input", "Please fill in all fields.");
+            return;
+        }
+        if (!isAlphaNumeric(username)) {
+            showAlert("Invalid Input", "Username must contain alphanumeric characters only.");
+            return;
+        }
+        if (!isNumeric(entityId)) {
+            showAlert("Invalid Input", "Entity ID must contain numbers only.");
+            return;
+        }
         User addUser = new User();
         addUser.setUsername(usernameField.getText());
         addUser.setEntity_id(entityIdField.getText());
@@ -98,5 +114,23 @@ public class CreateAccController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    private boolean isValidInput(String username, String entityId) {
+        return !username.isEmpty() && !entityId.isEmpty();
+    }
+    private boolean isAlphaNumeric(String str) {
+        return str.matches("^[a-zA-Z0-9]*$");
+    }
+
+    private boolean isNumeric(String str) {
+        return str.matches("[0-9]+");
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
