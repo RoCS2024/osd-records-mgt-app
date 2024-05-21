@@ -209,7 +209,7 @@ public class CsHistoryController implements Initializable{
 
         StudentInfoMgtApplication app = new StudentInfoMgtApplication();
         StudentFacade studentFacade = app.getStudentFacade();
-        Student student = studentFacade.getStudentById(studentId);
+        Student student = studentFacade.getStudentByNumber(studentId);
 
         if(student != null){
             System.out.println("Student ID: " + student);

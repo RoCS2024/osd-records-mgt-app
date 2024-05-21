@@ -17,79 +17,57 @@ import com.student.information.management.appl.model.student.Student;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.net.URL;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ResourceBundle;
 
-public class EditOffenseController {
+public class EditOffenseController implements Initializable {
     @FXML
-    private TextField offenseIdField;
-
-    @FXML
-    private TextField studentIdField;
+    private TextField offenseField;
 
     @FXML
-    private TextField violationField;
-
-    @FXML
-    private DatePicker offenseDateField;
+    private ComboBox<String> comboBox;
 
     private Offense offense;
 
     private OffenseFacade offenseFacade;
 
-    private ViolationFacade violationFacade;
-
-    private StudentFacade studentFacade;
-
     @FXML
-    protected void saveUpdateClicked(ActionEvent event) {
+    protected void saveEditOffenseClicked(ActionEvent event) {
         PrefectOfficeRecordMgtApplication app = new PrefectOfficeRecordMgtApplication();
         offenseFacade = app.getOffenseFacade();
-        violationFacade = app.getViolationFacade();
-
-        Violation violation = violationFacade.getViolationByName(violationField.getText());
-
-        StudentInfoMgtApplication appl = new StudentInfoMgtApplication();
-        studentFacade = appl.getStudentFacade();
-
-        Student student = studentFacade.getStudentById(studentIdField.getText());
 
         Offense editOffense = new Offense();
-        editOffense.setId(Integer.parseInt(offenseIdField.getText()));
-        editOffense.setStudent(student);
-        editOffense.setViolation(violation);
+        editOffense.setId(offense.getId());
+        editOffense.setType(comboBox.getValue());
+        editOffense.setDescription(offenseField.getText());
 
-        LocalDate selectedDate = offenseDateField.getValue();
-        if (selectedDate != null) {
-            try {
-                LocalDateTime localDateTime = selectedDate.atStartOfDay();
-                Timestamp timestamp = Timestamp.valueOf(localDateTime);
-                editOffense.setOffenseDate(timestamp);
-            } catch (IllegalArgumentException e) {
-                System.err.println("Invalid date format: " + selectedDate);
-                e.printStackTrace();
-            }
-        } else {
-            System.err.println("No date selected.");
-        }
+//        System.out.println(offense.getId());
+//        System.out.println(offense.getType());
+//        System.out.println(offense.getDescription());
 
         try {
+//            System.out.println(editOffense.getId());
+//            System.out.println(editOffense.getType());
+//            System.out.println(editOffense.getDescription());
             offenseFacade.updateOffense(editOffense);
         } catch(Exception ex) {
-            ex.printStackTrace();
+            ex.printStackTrace();;
         }
         finally {
-            //after save, go back to offense list
             try {
                 Stage previousStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 previousStage.close();
@@ -110,32 +88,31 @@ public class EditOffenseController {
         }
     }
 
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        comboBox.getItems().addAll("Minor", "Major");
+    }
+
     public void setOffense(Offense offense) {
         this.offense = offense;
-        offenseIdField.setText(String.valueOf(offense.getId()));
-
-        studentIdField.setText(offense.getStudent().getStudentId());
-        violationField.setText(offense.getViolation().getViolation());
-
-        //date picker format setter
-        Timestamp offenseTimestamp = offense.getOffenseDate();
-        LocalDate offenseLocalDate = offenseTimestamp.toLocalDateTime().toLocalDate();
-        offenseDateField.setValue(offenseLocalDate);
+        offense.getId();
+        comboBox.setValue(offense.getType());
+        offenseField.setText(offense.getDescription());
     }
 
     @FXML
-    protected void handleCancelEditOffense(MouseEvent event) {
+    protected void handleCancelEditOffenseClicked(MouseEvent event) {
         try {
-            Stage previousStage4 = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            previousStage4.close();
+            Stage previousStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            previousStage.close();
 
-            Stage dashboardStage4 = new Stage();
-            FXMLLoader loader4 = new FXMLLoader();
-            loader4.setLocation(getClass().getResource("/views/OffenseList.fxml"));
-            Parent root4 = loader4.load();
-            Scene scene4 = new Scene(root4);
-            dashboardStage4.setScene(scene4);
-            dashboardStage4.show();
+            Stage dashboardStage = new Stage();
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/views/OffenseList.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            dashboardStage.setScene(scene);
+            dashboardStage.show();
         } catch (Exception e) {
             e.printStackTrace();
         }
