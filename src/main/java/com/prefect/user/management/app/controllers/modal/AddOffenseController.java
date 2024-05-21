@@ -10,6 +10,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -29,6 +31,30 @@ public class AddOffenseController  implements Initializable {
     private OffenseFacade offenseFacade;
 
     @FXML
+    public void initialize() {
+        PrefectOfficeRecordMgtApplication appl = new PrefectOfficeRecordMgtApplication();
+        violationFacade = appl.getViolationFacade();
+
+        // Retrieve all violations from the database
+        List<Violation> violations = violationFacade.getAllViolation();
+
+        // Extract violation names from violations
+        List<String> violationNames = violations.stream()
+                .map(Violation::getViolation)
+                .collect(Collectors.toList());
+
+        // Populate the ComboBox with violation names
+        violationComboBox.getItems().addAll(violationNames);
+
+        saveButton.disableProperty().bind(studentIdField.textProperty().isEmpty()
+                .or(violationComboBox.valueProperty().isNull())
+                .or(offenseDateField.valueProperty().isNull())
+        );
+    }
+    }
+
+
+    @FXML
     protected void saveAddOffenseClicked(ActionEvent event) {
         PrefectOfficeRecordMgtApplication app = new PrefectOfficeRecordMgtApplication();
         offenseFacade = app.getOffenseFacade();
@@ -37,6 +63,24 @@ public class AddOffenseController  implements Initializable {
         addOffense.setDescription(offenseField.getText());
         addOffense.setType(comboBox.getValue());
 
+        if (!validateInput()) {
+            showAlert("Error", "All fields are important. Please enter valid input.", Alert.AlertType.ERROR);
+            return;
+        }
+
+        LocalDate selectedDate = offenseDateField.getValue();
+        if (selectedDate != null) {
+            try {
+                LocalDateTime localDateTime = selectedDate.atStartOfDay();
+                Timestamp timestamp = Timestamp.valueOf(localDateTime);
+                addOffense.setOffenseDate(timestamp);
+            } catch (IllegalArgumentException e) {
+                System.err.println("Invalid date format: " + selectedDate);
+                e.printStackTrace();
+            }
+        } else {
+            System.err.println("No date selected.");
+        }
 
         try {
             offenseFacade.addOffense(addOffense);
@@ -64,6 +108,12 @@ public class AddOffenseController  implements Initializable {
             }
         }
     }
+    private boolean validateInput() {
+        return !studentIdField.getText().isEmpty()
+            && violationComboBox.getValue() != null
+            && offenseDateField.getValue() != null;
+}
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -88,4 +138,19 @@ public class AddOffenseController  implements Initializable {
             e.printStackTrace();
         }
     }
-}
+    @FXML
+    protected void handleStudentIdChanged(KeyEvent event) {
+
+        if(!studentIdField.getText().isEmpty()){
+            StudentInfoMgtApplication appl = new StudentInfoMgtApplication();
+            studentFacade = appl.getStudentFacade();
+            Student student = studentFacade.getStudentById(studentIdField.getText());
+            if (student != null) {
+                String fullName = student.getLastName() + ", " + student.getFirstName() + " " + student.getMiddleName();
+                studentNameField.setText(fullName);
+            } else {
+                studentNameField.clear();
+            }
+        }
+    }
+

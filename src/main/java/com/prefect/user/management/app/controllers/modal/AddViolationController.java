@@ -17,12 +17,16 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
+import java.net.URL;
+import java.util.ResourceBundle;
+import java.util.regex.Pattern;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -58,6 +62,23 @@ public class AddViolationController{
     private EmployeeFacade employeeFacade;
 
     @FXML
+    protected void saveAddViolationClicked(ActionEvent event) {
+        String violationName = violationField.getText().trim();
+        String violationType = comboBox.getValue();
+        String commServHoursText = commServHours.getText().trim();
+
+        if (violationName.isEmpty() || violationType == null || commServHoursText.isEmpty()) {
+            showAlert("Error", "All fields are important. Please enter valid input.", Alert.AlertType.ERROR);
+            return;
+        }
+
+        if (!validateNumericInput(commServHoursText)) {
+            showAlert("Error", "Community service hours must be a numeric value.", Alert.AlertType.ERROR);
+            return;
+        }
+
+        int violationCsHour = Integer.parseInt(commServHoursText);
+
     public void initialize() {
         PrefectOfficeRecordMgtApplication appl = new PrefectOfficeRecordMgtApplication();
         offenseFacade = appl.getOffenseFacade();
@@ -88,6 +109,9 @@ public class AddViolationController{
         Employee employee = employeeFacade.getEmployeeById(employeeIdField.getText());
 
         Violation addViolation = new Violation();
+        addViolation.setViolation(violationName);
+        addViolation.setType(violationType);
+        addViolation.setCommServHours(violationCsHour);
         addViolation.setStudent(student);
         addViolation.setOffense(offense);
         addViolation.setApprovedBy(employee);
@@ -114,6 +138,8 @@ public class AddViolationController{
             violationFacade.addViolation(addViolation);
         } catch(Exception ex) {
             ex.printStackTrace();
+        }
+        finally {
         } finally {
             try {
                 Stage previousStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -133,6 +159,21 @@ public class AddViolationController{
                 e.printStackTrace();
             }
         }
+    }
+    private boolean validateInput(String input) {
+        return Pattern.matches("[a-zA-Z0-9]+", input);
+    }
+
+    private boolean validateNumericInput(String input) {
+        return Pattern.matches("\\d+", input);
+    }
+
+    private void showAlert(String title, String content, Alert.AlertType alertType) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     @FXML
@@ -184,3 +225,4 @@ public class AddViolationController{
         }
     }
 }
+

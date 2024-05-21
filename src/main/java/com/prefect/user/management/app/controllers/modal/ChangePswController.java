@@ -70,6 +70,14 @@ public class ChangePswController {
 
     @FXML
     protected void setSaveChangePswClicked(ActionEvent event) {
+        if (!newPswField.getText().equals(confirmPswField.getText())) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Password Mismatch");
+            alert.setHeaderText(null);
+            alert.setContentText("New Password and Confirm Password fields do not match. Please try again.");
+            alert.showAndWait();
+            return;
+        }
         User updatePsw = new User();
         updatePsw.setUsername(usernameField.getText());
         updatePsw.setPassword(newPswField.getCharacters().toString());
