@@ -1,9 +1,11 @@
 module com.prefect.user.management.app {
     requires javafx.controls;
     requires javafx.fxml;
-    requires porms;
+    requires rc.porms;
     requires umsv2;
-    requires sims;
+    requires rc.sims;
+    requires rc.eims;
+
     requires java.sql;
     requires org.apache.logging.log4j.slf4j2.impl;
 
