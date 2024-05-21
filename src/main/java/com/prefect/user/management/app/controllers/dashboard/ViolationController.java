@@ -1,6 +1,7 @@
 package com.prefect.user.management.app.controllers.dashboard;
 
 import com.prefect.office.record.management.PrefectOfficeRecordMgtApplication;
+import com.prefect.office.record.management.appl.facade.prefect.offense.OffenseFacade;
 import com.prefect.office.record.management.appl.facade.prefect.violation.impl.ViolationFacadeImpl;
 import com.prefect.office.record.management.appl.model.violation.Violation;
 import com.prefect.office.record.management.appl.facade.prefect.violation.*;
@@ -9,10 +10,14 @@ import com.prefect.user.management.app.controllers.modal.ChangePswController;
 import com.prefect.user.management.app.controllers.modal.EditViolationController;
 import com.prefect.user.management.app.controllers.search.SearchOffenseController;
 import com.prefect.user.management.app.controllers.search.SearchViolationController;
+import com.student.information.management.StudentInfoMgtApplication;
 import com.student.information.management.appl.facade.student.StudentFacade;
 import com.student.information.management.appl.facade.student.impl.StudentFacadeImpl;
 import com.student.information.management.appl.model.student.Student;
+import com.user.management.appl.facade.employee.EmployeeFacade;
+import com.user.management.appl.model.employee.Employee;
 import com.user.management.appl.model.user.User;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -34,9 +39,13 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Callback;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -54,61 +63,76 @@ public class ViolationController implements Initializable {
 
     private boolean sidebarVisible = false;
 
-    @FXML
-    private ComboBox<String> filterBox;
-
     //for search
     @FXML
     private TextField searchField;
 
+    @FXML
+    private ToggleButton searchButton;
+
     //for table id
     @FXML
-    TableView table;
+    TableView tableView;
 
     private ViolationFacade violationFacade;
 
+    private StudentFacade studentFacade;
+
+    private EmployeeFacade employeeFacade;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        filterBox.getItems().addAll("All", "Minor", "Major");
-        filterBox.setValue("All");
 
         PrefectOfficeRecordMgtApplication app = new PrefectOfficeRecordMgtApplication();
         violationFacade = app.getViolationFacade();
 
+        tableView.getItems().clear();
         List<Violation> violations = violationFacade.getAllViolation();
         ObservableList<Violation> data = FXCollections.observableArrayList(violations);
+        tableView.setItems(data);
 
-        setupTable(data);
-
-        filterBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            List<Violation> filteredViolations = filterViolations(newValue);
-            ObservableList<Violation> filteredData = FXCollections.observableArrayList(filteredViolations);
-
-            setupTable(filteredData);
+        TableColumn<Violation, String> studColumn = new TableColumn<>("STUDENT NAME");
+        studColumn.setCellValueFactory(cellData -> {
+            String firstName = cellData.getValue().getStudent().getFirstName();
+            String lastName = cellData.getValue().getStudent().getLastName();
+            return new SimpleStringProperty(firstName + " " + lastName);
         });
-    }
+        studColumn.getStyleClass().addAll("student-column");
 
-    private void setupTable(ObservableList<Violation> data) {
-        table.getItems().clear();
-        table.setItems(data);
+        TableColumn<Violation, String> offenseColumn = new TableColumn<>("OFFENSE");
+        offenseColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getOffense().getDescription()));
+        offenseColumn.getStyleClass().addAll("offense-id-column");
 
-        TableColumn violationColumn = new TableColumn("VIOLATION");
-        violationColumn.setCellValueFactory(new PropertyValueFactory<>("violation"));
-        violationColumn.getStyleClass().addAll("violation-column");
+        TableColumn<Violation, Integer> warningColumn = new TableColumn<>("WARNING NO.");
+        warningColumn.setCellValueFactory(new PropertyValueFactory<>("warningNum"));
+        warningColumn.getStyleClass().addAll("warning-column");
 
-        TableColumn violationTypeColumn = new TableColumn("VIOLATION TYPE");
-        violationTypeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
-        violationTypeColumn.getStyleClass().addAll("type-column");
+        TableColumn<Violation, Integer> csHoursColumn = new TableColumn<>("CS HOURS");
+        csHoursColumn.setCellValueFactory(new PropertyValueFactory<>("commServHours"));
+        csHoursColumn.getStyleClass().addAll("cs-hours-column");
 
-        TableColumn totalCsHoursColumn = new TableColumn("CS HOURS");
-        totalCsHoursColumn.setCellValueFactory(new PropertyValueFactory<>("commServHours"));
-        totalCsHoursColumn.getStyleClass().addAll("cs-hours-column");
+        TableColumn<Violation, String> disciplinaryColumn = new TableColumn<>("DISCIPLINARY ACTION");
+        disciplinaryColumn.setCellValueFactory(new PropertyValueFactory<>("disciplinaryAction"));
+        disciplinaryColumn.getStyleClass().addAll("disciplinary-column");
+
+        TableColumn<Violation, Timestamp> dateColumn = new TableColumn<>("DATE OF NOTICE");
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("dateOfNotice"));
+        dateColumn.getStyleClass().addAll("date-column");
+        dateColumn.setCellFactory(getDateCellFactory());
+
+        TableColumn<Violation, String> approvedByColumn = new TableColumn<>("APPROVED BY");
+        approvedByColumn.setCellValueFactory(cellData -> {
+            String firstName = cellData.getValue().getApprovedBy().getFirstName();
+            String lastName = cellData.getValue().getApprovedBy().getLastName();
+            return new SimpleStringProperty(firstName + " " + lastName);
+        });
+        approvedByColumn.getStyleClass().addAll("approvedBy-column");
 
         TableColumn<Violation, String> actionColumn = new TableColumn<>("ACTION");
         actionColumn.setCellValueFactory(new PropertyValueFactory<>(""));
         actionColumn.getStyleClass().addAll("action-column");
         actionColumn.setCellFactory(cell -> {
-            final Button editButton = new Button();
+            final Button editButton_2 = new Button();
             TableCell<Violation, String> cellInstance = new TableCell<>() {
                 @Override
                 public void updateItem(String item, boolean empty) {
@@ -117,12 +141,12 @@ public class ViolationController implements Initializable {
                         setGraphic(null);
                         setText(null);
                     } else {
-                        editButton.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/assets/pencil.png"))));
-                        editButton.setOnAction(event -> {
+                        editButton_2.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/assets/pencil.png"))));
+                        editButton_2.setOnAction(event -> {
                             Violation violation = getTableView().getItems().get(getIndex());
                             showEditViolation(violation, (ActionEvent) event);
                         });
-                        HBox hbox = new HBox(editButton);
+                        HBox hbox = new HBox(editButton_2);
                         hbox.setSpacing(10);
                         hbox.setAlignment(Pos.BASELINE_CENTER);
                         setGraphic(hbox);
@@ -133,43 +157,24 @@ public class ViolationController implements Initializable {
             return cellInstance;
         });
 
-        table.getColumns().setAll(violationColumn, violationTypeColumn, totalCsHoursColumn, actionColumn);
+        tableView.getColumns().addAll(studColumn, offenseColumn , warningColumn, csHoursColumn, disciplinaryColumn, dateColumn, approvedByColumn, actionColumn);
     }
 
-    private List<Violation> filterViolations(String filter) {
-        if (filter.equals("All")) {
-            return violationFacade.getAllViolation();
-        } else if (filter.equals("Minor")) {
-            return violationFacade.getAllViolationByType("Minor");
-        } else if (filter.equals("Major")) {
-            return violationFacade.getAllViolationByType("Major");
-        }
-        //empty return
-        return new ArrayList<>();
-    }
+    private Callback<TableColumn<Violation, Timestamp>, TableCell<Violation, Timestamp>> getDateCellFactory() {
+        return column -> new TableCell<>() {
+            private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-
-    @FXML
-    protected void handleSubmitAddViolationButton(ActionEvent event) {
-        Stage stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
-        stage.hide();
-        showDashboard();
-    }
-
-    private void showDashboard() {
-        try {
-            Stage dashboardStage = new Stage();
-            dashboardStage.initStyle(StageStyle.UNDECORATED);
-
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/views/AddViolation.fxml"));
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
-            dashboardStage.setScene(scene);
-            dashboardStage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            @Override
+            protected void updateItem(Timestamp item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    LocalDate date = item.toLocalDateTime().toLocalDate();
+                    setText(formatter.format(date));
+                }
+            }
+        };
     }
 
     @FXML
@@ -240,24 +245,47 @@ public class ViolationController implements Initializable {
         }
     }
 
-    //show details in edit button
+    @FXML
+    protected void handleSubmitAddViolationButton(ActionEvent event) {
+        Stage stage2 = (Stage) ((Node)event.getSource()).getScene().getWindow();
+        stage2.hide();
+        showDashboard2();
+    }
+
+    private void showDashboard2() {
+        try {
+            Stage dashboardStage2 = new Stage();
+            dashboardStage2.initStyle(StageStyle.UNDECORATED);
+
+            FXMLLoader loader2 = new FXMLLoader();
+            loader2.setLocation(getClass().getResource("/views/AddViolation.fxml"));
+            Parent root2 = loader2.load();
+            Scene scene2 = new Scene(root2);
+            dashboardStage2.setScene(scene2);
+            dashboardStage2.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     private void showEditViolation(Violation violation, ActionEvent event) {
         try {
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.close();
 
-            Stage editViolationStage = new Stage();
-            editViolationStage.initStyle(StageStyle.UNDECORATED);
+            Stage editStage = new Stage();
+            editStage.initStyle(StageStyle.UNDECORATED);
 
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("/views/EditViolation.fxml"));
-            AnchorPane editViolationLayout = new AnchorPane();
-            editViolationLayout = loader.load();
+            AnchorPane editLayout = new AnchorPane();
+            editLayout = loader.load();
             EditViolationController editViolationController = loader.getController();
             editViolationController.setViolation(violation);
-            Scene scene = new Scene(editViolationLayout);
-            editViolationStage.setScene(scene);
-            editViolationStage.show();
+            Scene scene = new Scene(editLayout);
+            editStage.setScene(scene);
+            editStage.show();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -280,21 +308,39 @@ public class ViolationController implements Initializable {
     //for search
     @FXML
     private void handleSearchButton(ActionEvent event) {
-        String violationName = searchField.getText();
+        StudentInfoMgtApplication app = new StudentInfoMgtApplication();
+        studentFacade = app.getStudentFacade();
 
-        System.out.println("Violation Name: " + violationName);
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/SearchViolation.fxml"));
+        Student student = studentFacade.getStudentByNumber(searchField.getText());
+        System.out.println("Student ID: " + searchField.getText());
+        System.out.println("Student ID: " + student.getStudentId());
 
-            SearchViolationController searchViolationController = new SearchViolationController();
-            searchViolationController.initData(violationName);
-            loader.setController(searchViolationController);
-            Parent root = loader.load();
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(student != null){
+            System.out.println("Student ID: " + student.getStudentId());
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/SearchViolation.fxml"));
+
+                SearchViolationController searchController = new SearchViolationController();
+                searchController.initData(student);
+                loader.setController(searchController);
+                Parent root = loader.load();
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+        else {
+            showAlert(Alert.AlertType.WARNING, "Warning", "Student ID Not Found", "Student with ID " + searchField.getText() + " does not exist.");
+
+        }
+    }
+    private void showAlert(Alert.AlertType alertType, String title, String headerText, String contentText) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(contentText);
+        alert.showAndWait();
     }
 }

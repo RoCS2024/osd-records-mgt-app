@@ -5,8 +5,10 @@ import com.prefect.office.record.management.appl.facade.prefect.communityservice
 import com.prefect.office.record.management.appl.facade.prefect.communityservice.impl.CommunityServiceFacadeImpl;
 import com.prefect.office.record.management.appl.facade.prefect.offense.OffenseFacade;
 import com.prefect.office.record.management.appl.facade.prefect.offense.impl.OffenseFacadeImpl;
+import com.prefect.office.record.management.appl.facade.prefect.violation.ViolationFacade;
 import com.prefect.office.record.management.appl.model.communityservice.CommunityService;
 import com.prefect.office.record.management.appl.model.offense.Offense;
+import com.prefect.office.record.management.appl.model.violation.Violation;
 import com.prefect.office.record.management.data.dao.prefect.communityservice.CommunityServiceDao;
 import com.prefect.office.record.management.data.dao.prefect.communityservice.impl.CommunityServiceDaoImpl;
 import com.prefect.office.record.management.data.dao.prefect.offense.OffenseDao;
@@ -31,26 +33,22 @@ import javafx.stage.StageStyle;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class RenderCsByStudentController {
-    @FXML
-    private TextField offenseIdField;
 
     @FXML
     private TextField studentIdField;
-
     @FXML
     private DatePicker dateRenderedField;
-
     @FXML
     private TextField hoursRenderedField;
 
     @FXML
     private Button saveRenderButton;
+
     private CommunityServiceFacade communityServiceFacade;
-
-    private OffenseFacade offenseFacade;
-
+    private ViolationFacade violationFacade;
     private StudentFacade studentFacade;
 
     //click save button to save rendered cs to database
@@ -58,33 +56,36 @@ public class RenderCsByStudentController {
     protected void saveRenderClicked(ActionEvent event) {
         PrefectOfficeRecordMgtApplication app = new PrefectOfficeRecordMgtApplication();
         communityServiceFacade = app.getCommunityserviceFacade();
-        offenseFacade = app.getOffenseFacade();
+        violationFacade = app.getViolationFacade();
 
-        Offense existingOffense = offenseFacade.getOffenseByID(Integer.parseInt(offenseIdField.getText()));
-        if (existingOffense != null) {
             CommunityService renderCs = new CommunityService();
 
             StudentInfoMgtApplication appl = new StudentInfoMgtApplication();
             studentFacade = appl.getStudentFacade();
-            Student student = studentFacade.getStudentById(studentIdField.getText());
-            renderCs.setStudent(student);
+            Student student = studentFacade.getStudentByNumber(studentIdField.getText());
 
+            List<Violation> existingViolation = violationFacade.getAllViolationByStudent(student);
+            if (existingViolation != null) {
+                renderCs.setStudent(student);
 
-            LocalDate selectedDate = dateRenderedField.getValue();
-            if (selectedDate != null) {
-                try {
-                    LocalDateTime localDateTime = selectedDate.atStartOfDay();
-                    Timestamp timestamp = Timestamp.valueOf(localDateTime);
-                    renderCs.setDate_rendered(timestamp);
-                } catch (IllegalArgumentException e) {
-                    System.err.println("Invalid date format: " + selectedDate);
-                    e.printStackTrace();
+                LocalDate selectedDate = dateRenderedField.getValue();
+                if (selectedDate != null) {
+                    try {
+                        LocalDateTime localDateTime = selectedDate.atStartOfDay();
+                        Timestamp timestamp = Timestamp.valueOf(localDateTime);
+                        renderCs.setDate_rendered(timestamp);
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Invalid date format: " + selectedDate);
+                        e.printStackTrace();
+                    }
+                } else {
+                    System.err.println("No date selected.");
                 }
-            } else {
-                System.err.println("No date selected.");
-            }
 
-            renderCs.setHours_rendered(Integer.parseInt(hoursRenderedField.getText()));
+                renderCs.setHours_rendered(Integer.parseInt(hoursRenderedField.getText()));
+            } else {
+                showAlert(Alert.AlertType.WARNING, "Warning", "No Violation found with Student ID", studentIdField.getText());
+            }
 
             try {
                 communityServiceFacade.renderCs(renderCs);
@@ -111,9 +112,6 @@ public class RenderCsByStudentController {
                     e.printStackTrace();
                 }
             }
-        } else {
-            showAlert(Alert.AlertType.WARNING, "Warning", "Offense ID Not Found", "Offense with ID " + Integer.parseInt(offenseIdField.getText()) + " does not exist.");
-        }
     }
 
     private void showAlert(Alert.AlertType alertType, String title, String headerText, String contentText) {
