@@ -17,6 +17,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
@@ -72,7 +73,21 @@ public class EditViolationController{
     }
 
     @FXML
+
+    protected void saveEditViolationClicked(ActionEvent event) {
+        String violationId = violationIdField.getText().trim();
+        String violationText = violationField.getText().trim();
+        String commServHoursText = commServHours.getText().trim();
+        String comboBoxValue = comboBox.getValue();
+
+        if (violationId.isEmpty() || violationText.isEmpty() || commServHoursText.isEmpty() || comboBoxValue == null) {
+            showAlert("Invalid Input", "All fields are important. Please enter valid input.");
+            return;
+        }
+
+
     protected void saveUpdateClicked(ActionEvent event) {
+
         PrefectOfficeRecordMgtApplication app = new PrefectOfficeRecordMgtApplication();
         violationFacade = app.getViolationFacade();
 
@@ -179,6 +194,13 @@ public class EditViolationController{
         }
     }
 
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+
     @FXML
     protected void handleStudentIdChanged(KeyEvent event) {
 
@@ -209,5 +231,6 @@ public class EditViolationController{
                 employeeNameField.clear();
             }
         }
+
     }
 }
